@@ -1,0 +1,43 @@
+package com.aliyun.config;
+
+import com.aliyun.core.sms.AliyunSmsService;
+import com.aliyun.model.AliyunCredential;
+import com.aliyun.properties.AliyunProperties;
+import com.aliyun.properties.pojo.AliyunSms;
+import com.aliyun.teaopenapi.models.Config;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * 阿里云号码认证配置。
+ */
+@Configuration
+@RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "aliyun.sms", name = "enable", havingValue = "true")
+public class AliyunSmsConfiguration extends AliyunBaseConfiguration implements InitializingBean {
+
+    private final AliyunProperties aliyunProperties;
+    private AliyunSms sms;
+    private AliyunCredential credential;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        sms = aliyunProperties.getSms();
+        credential = aliyunProperties.createStsCredential(sms.getRamRoleArn());
+    }
+
+    @Bean("aliyunSmsClient")
+    public com.aliyun.dysmsapi20170525.Client client() throws Exception{
+        Config config = createOpenApiConfig(credential);
+        config.endpoint = sms.getEndpoint();
+        return new com.aliyun.dysmsapi20170525.Client(config);
+    }
+
+    @Bean
+    public AliyunSmsService aliyunSmsService() throws Exception {
+        return new AliyunSmsService(sms,client());
+    }
+}

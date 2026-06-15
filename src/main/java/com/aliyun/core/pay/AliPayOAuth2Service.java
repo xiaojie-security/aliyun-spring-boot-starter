@@ -22,11 +22,11 @@ public class AliPayOAuth2Service extends AbstractAlipayService{
     private static final String REFRESH_TOKEN = "refresh_token";
 
     private final com.alipay.api.AlipayClient client;
-    private final AliPayDetails aliPayDetails;
+    private final AliPayDetails details;
 
     @Override
     protected AliPayDetails getAliPayDetails() {
-        return aliPayDetails;
+        return details;
     }
 
     @Override

@@ -37,11 +37,13 @@ public class AliPayAppService extends AbstractAlipayService{
     private static final String APP_PAY_PRODUCT_CODE = "QUICK_MSECURITY_PAY";
 
     private final com.alipay.api.AlipayClient client;
-    private final AliPayDetails aliPayDetails;
+    private final AliPayDetails details;
+    public static final String FUND_CHANGE = "Y";
+    public static final String REFUND_SUCCESS = "REFUND_SUCCESS";
 
     @Override
     protected AliPayDetails getAliPayDetails() {
-        return aliPayDetails;
+        return details;
     }
 
     @Override
@@ -75,7 +77,7 @@ public class AliPayAppService extends AbstractAlipayService{
         model.setSubject(subject);
         model.setProductCode(APP_PAY_PRODUCT_CODE);
 
-        Long validityTime = aliPayDetails.getValidityTime();
+        Long validityTime = details.getValidityTime();
         if (validityTime != null && validityTime > 0) {
             LocalDateTime expireTime = LocalDateTime.now().plusNanos(validityTime * 1_000_000);
             String timeExpire = expireTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -238,6 +240,22 @@ public class AliPayAppService extends AbstractAlipayService{
             throw AliPayException.QUERY_REFUND_ERROR;
         }
     }
+
+    /**
+     * 判断支付宝退款是否成功
+     */
+    public static boolean isRefundSuccess(AlipayTradeRefundResponse response) {
+        return response.isSuccess() && FUND_CHANGE.equals(response.getFundChange());
+    }
+
+    /**
+     * 判断支付宝退款查询结果是否成功
+     */
+    public static boolean isRefundQuerySuccess(AlipayTradeFastpayRefundQueryResponse response) {
+        return response.isSuccess() && REFUND_SUCCESS.equals(response.getRefundStatus());
+    }
+
+
 
 
 }

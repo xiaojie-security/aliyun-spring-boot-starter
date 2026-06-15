@@ -26,11 +26,12 @@ public class AlipayFundService extends AbstractAlipayService{
     private final String PRODUCT_CODE = "TRANS_ACCOUNT_NO_PWD";
     private final String BIZ_SCENE = "DIRECT_TRANSFER";
     private final com.alipay.api.AlipayClient client;
-    private final AliPayDetails aliPayDetails;
+    private final AliPayDetails details;
+    private static final String SUCCESS = "SUCCESS";
 
     @Override
     protected AliPayDetails getAliPayDetails() {
-        return aliPayDetails;
+        return details;
     }
 
     @Override
@@ -121,6 +122,20 @@ public class AlipayFundService extends AbstractAlipayService{
                     outBizNo, orderId, payFundOrderId, e.getErrCode(), e.getErrMsg(), e.getErrCode(), e.getErrMsg(), e);
             throw AliPayException.TRANSFER_ERROR;
         }
+    }
+
+    /**
+     * 判断支付宝单笔转账是否成功。
+     */
+    public static boolean isTransferSuccess(AlipayFundTransUniTransferResponse response) {
+        return response.isSuccess() && SUCCESS.equals(response.getStatus());
+    }
+
+    /**
+     * 判断支付宝转账查询结果是否成功。
+     */
+    public static boolean isTransferSuccess(AlipayFundTransCommonQueryResponse response) {
+        return response.isSuccess() && SUCCESS.equals(response.getStatus());
     }
 
 }

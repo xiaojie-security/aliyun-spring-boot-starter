@@ -1,16 +1,23 @@
 package com.aliyun.core.pay;
 
-import com.alipay.api.AlipayApiException;
+import com.alipay.api.*;
 import com.alipay.api.diagnosis.DiagnosisUtils;
-import com.alipay.api.domain.*;
-import com.alipay.api.request.*;
-import com.alipay.api.response.*;
-
+import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.domain.AlipayTradeFastpayRefundQueryModel;
+import com.alipay.api.domain.AlipayTradeQueryModel;
+import com.alipay.api.domain.AlipayTradeRefundModel;
+import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.request.AlipayTradeRefundRequest;
+import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.aliyun.core.exception.AliyunException;
 import com.aliyun.exception.AliPayException;
 import com.aliyun.model.AliPayDetails;
 import com.aliyun.model.AliPayRefundParam;
-import com.aliyun.model.AliPaySystemOauthDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,112 +30,24 @@ import java.time.format.DateTimeFormatter;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class AppAliPayService {
+public class AliPayAppService extends AbstractAlipayService{
     /**
      * 支付宝 APP 支付固定产品码。
      */
     private static final String APP_PAY_PRODUCT_CODE = "QUICK_MSECURITY_PAY";
-    private static final String AUTHORIZATION_CODE = "authorization_code";
-    private static final String REFRESH_TOKEN = "refresh_token";
 
-    private final com.alipay.api.AlipayClient appPayClient;
+    private final com.alipay.api.AlipayClient client;
     private final AliPayDetails aliPayDetails;
 
-
-    /**
-     * 查询支付宝用户授权信息
-     * <p>
-     * 使用访问令牌获取用户的授权基本信息，包括用户ID、昵称、头像等。
-     * 该接口需要在用户授权后调用，且访问令牌需具备相应的用户信息读取权限。
-     * </p>
-     *
-     * @param accessToken 用户授权访问令牌，通过OAuth授权流程获取
-     * @return 用户信息共享响应，包含用户基本信息
-     * @throws AliPayException 当支付宝API调用失败时抛出异常
-     */
-    public AlipayUserInfoShareResponse queryUserInfoShare(String accessToken) {
-        AlipayUserInfoShareRequest request = new AlipayUserInfoShareRequest();
-        try {
-            return appPayClient.certificateExecute(request,accessToken);
-        } catch (AlipayApiException e) {
-            log.error("查询用户信息异常 - 错误码: {}, 错误信息: {}", e.getErrCode(), e.getErrMsg());
-            throw AliPayException.QUERY_USER_ERROR;
-        }
+    @Override
+    protected AliPayDetails getAliPayDetails() {
+        return aliPayDetails;
     }
 
-    /**
-     * 通过授权码获取系统OAuth令牌
-     * <p>
-     * 使用支付宝授权码换取访问令牌和刷新令牌，用于后续API调用。
-     * </p>
-     *
-     * @param authorizationCode 支付宝授权码，由用户授权后获得
-     * @return OAuth令牌详情，包含访问令牌、刷新令牌和用户OpenID
-     */
-    public AliPaySystemOauthDetails querySystemOAuthTokenByAuthorizationCode(String authorizationCode) {
-        return getSystemOAuthToken(AUTHORIZATION_CODE, authorizationCode, null);
+    @Override
+    protected AlipayClient getAlipayClient() {
+        return client;
     }
-
-    /**
-     * 通过刷新令牌获取系统OAuth令牌
-     * <p>
-     * 使用刷新令牌重新获取访问令牌，适用于访问令牌过期的场景。
-     * </p>
-     *
-     * @param refreshToken 刷新令牌，用于获取新的访问令牌
-     * @return OAuth令牌详情，包含新的访问令牌、刷新令牌和用户OpenID
-     */
-    public AliPaySystemOauthDetails querySystemOAuthTokenByRefreshToken(String refreshToken) {
-        return getSystemOAuthToken(REFRESH_TOKEN, null, refreshToken);
-    }
-
-    /**
-     * 获取支付宝系统OAuth访问令牌
-     * <p>
-     * 根据授权类型（授权码或刷新令牌）调用支付宝接口获取访问令牌。
-     * 支持两种授权方式：
-     * <ul>
-     *     <li>authorization_code - 使用授权码换取令牌</li>
-     *     <li>refresh_token - 使用刷新令牌更新令牌</li>
-     * </ul>
-     * </p>
-     *
-     * @param grantType 授权类型，可选值：AUTHORIZATION_CODE 或 REFRESH_TOKEN
-     * @param code 授权码，当 grantType 为 AUTHORIZATION_CODE 时必填
-     * @param refreshToken 刷新令牌，当 grantType 为 REFRESH_TOKEN 时必填
-     * @return OAuth令牌详情，包含访问令牌、刷新令牌和用户OpenID
-     * @throws AliPayException 当支付宝API调用失败时抛出异常
-     */
-    private AliPaySystemOauthDetails getSystemOAuthToken(String grantType, String code, String refreshToken) {
-        // 构造请求参数以调用接口
-        AlipaySystemOauthTokenRequest request = new AlipaySystemOauthTokenRequest();
-
-        // 设置刷新令牌
-        request.setRefreshToken(refreshToken);
-
-        // 设置授权码
-        request.setCode(code);
-
-        // 设置授权方式
-        request.setGrantType(grantType);
-
-        try {
-            AlipaySystemOauthTokenResponse response = appPayClient.certificateExecute(request);
-            String aToken = response.getAccessToken();
-            String rToken = response.getRefreshToken();
-            String openId = response.getOpenId();
-            return AliPaySystemOauthDetails.builder()
-                    .accessToken(aToken)
-                    .refreshToken(rToken)
-                    .openId(openId)
-                    .build();
-        } catch (AlipayApiException e) {
-            log.error("获取授权访问令牌异常 - 错误码: {}, 错误信息: {}", e.getErrCode(), e.getErrMsg(),e);
-            throw AliPayException.REQUEST_TOKEN_ERROR;
-        }
-    }
-
-
 
     /**
      * 生成支付宝APP支付订单签名字符串
@@ -143,20 +62,18 @@ public class AppAliPayService {
      * @return 支付宝支付签名字符串（orderStr），用于客户端调起支付
      * @throws AlipayApiException 支付宝API调用异常时抛出
      */
-    public String generateOrderStr(String out_trade_no, BigDecimal total_amount, String subject, Boolean isRoyaltyFreeze, String notify_url) throws AlipayApiException {
+    public String generateOrderStr(String out_trade_no, BigDecimal total_amount, String subject, Boolean isRoyaltyFreeze, String notifyUrl) throws AlipayApiException {
         log.info("开始生成支付宝APP支付订单 - 商户订单号: {}, 订单金额: {}, 订单标题: {}, 是否分账冻结: {}",
                 out_trade_no, total_amount, subject, isRoyaltyFreeze);
 
         AlipayTradeAppPayRequest request = new AlipayTradeAppPayRequest();
-        request.setNotifyUrl(notify_url);
+        request.setNotifyUrl(notifyUrl);
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
 
         model.setOutTradeNo(out_trade_no);
         model.setTotalAmount(total_amount.toPlainString());
         model.setSubject(subject);
-        // APP 支付场景必须传入固定产品码，否则客户端可能提示商家订单参数异常。
         model.setProductCode(APP_PAY_PRODUCT_CODE);
-//        model.setGoodsDetail(goodsDetails);
 
         Long validityTime = aliPayDetails.getValidityTime();
         if (validityTime != null && validityTime > 0) {
@@ -166,22 +83,13 @@ public class AppAliPayService {
             log.info("设置订单超时时间 - 商户订单号: {}, 超时时间: {}", out_trade_no, timeExpire);
         }
 
-//        ExtendParams extendParams = new ExtendParams();
-//        extendParams.setRoyaltyFreeze(isRoyaltyFreeze.toString());
-//        extendParams.setCardType("S0JP0000");
-//        model.setExtendParams(extendParams);
 
         model.setMerchantOrderNo(out_trade_no);
-
-//        List<String> queryOptions = new ArrayList<String>();
-//        queryOptions.add("hyb_amount");
-//        queryOptions.add("enterprise_pay_info");
-//        model.setQueryOptions(queryOptions);
 
         request.setBizModel(model);
 
         try {
-            AlipayTradeAppPayResponse response = appPayClient.sdkExecute(request);
+            AlipayTradeAppPayResponse response = client.sdkExecute(request);
             String orderStr = response.getBody();
 
             if (response.isSuccess()) {
@@ -226,7 +134,7 @@ public class AppAliPayService {
 
         try {
             request.setBizModel(model);
-            AlipayTradeQueryResponse response = appPayClient.certificateExecute(request);
+            AlipayTradeQueryResponse response = execute(request);
 
             log.info("支付宝交易查询完成 - 商户订单号: {}, 支付宝交易号: {}, 响应码: {}, 响应消息: {}, 交易状态: {}",
                     out_trade_no, trade_no, response.getCode(), response.getMsg(), response.getTradeStatus());
@@ -272,7 +180,7 @@ public class AppAliPayService {
 
         try {
             request.setBizModel(model);
-            AlipayTradeRefundResponse response = appPayClient.certificateExecute(request);
+            AlipayTradeRefundResponse response = execute(request);
 
             log.info("支付宝订单退款申请完成 - 商户订单号: {}, 支付宝交易号: {}, 响应码: {}, 响应消息: {}, 退款金额: {}, 资金变化: {} , 标题信息：{}",
                     aliPayRefundParam.getOutTradeNo(),
@@ -318,7 +226,7 @@ public class AppAliPayService {
 
         try {
             request.setBizModel(model);
-            AlipayTradeFastpayRefundQueryResponse response = appPayClient.certificateExecute(request);
+            AlipayTradeFastpayRefundQueryResponse response = execute(request);
 
             log.info("支付宝订单退款查询完成 - 商户订单号: {}, 支付宝交易号: {}, 退款请求号: {}, 响应码: {}, 响应消息: {}, 退款状态: {}",
                     out_trade_no, trade_no, refund_request_no, response.getCode(), response.getMsg(), response.getRefundStatus());
@@ -330,4 +238,6 @@ public class AppAliPayService {
             throw AliPayException.QUERY_REFUND_ERROR;
         }
     }
+
+
 }

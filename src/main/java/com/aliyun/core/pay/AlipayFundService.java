@@ -1,6 +1,9 @@
 package com.aliyun.core.pay;
 
 import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.AlipayRequest;
+import com.alipay.api.AlipayResponse;
 import com.alipay.api.domain.AlipayFundTransCommonQueryModel;
 import com.alipay.api.domain.AlipayFundTransUniTransferModel;
 import com.alipay.api.domain.Participant;
@@ -9,6 +12,7 @@ import com.alipay.api.request.AlipayFundTransUniTransferRequest;
 import com.alipay.api.response.AlipayFundTransCommonQueryResponse;
 import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import com.aliyun.exception.AliPayException;
+import com.aliyun.model.AliPayDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,11 +21,23 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class AlipayFundService {
+public class AlipayFundService extends AbstractAlipayService{
     public static final String ALIPAY_OPEN_ID = "ALIPAY_OPEN_ID";
     private final String PRODUCT_CODE = "TRANS_ACCOUNT_NO_PWD";
     private final String BIZ_SCENE = "DIRECT_TRANSFER";
-    private final com.alipay.api.AlipayClient fundPayClient;
+    private final com.alipay.api.AlipayClient client;
+    private final AliPayDetails aliPayDetails;
+
+    @Override
+    protected AliPayDetails getAliPayDetails() {
+        return aliPayDetails;
+    }
+
+    @Override
+    protected AlipayClient getAlipayClient() {
+        return client;
+    }
+
 
 
     /**
@@ -58,7 +74,7 @@ public class AlipayFundService {
 
         try {
             request.setBizModel(model);
-            AlipayFundTransUniTransferResponse response = fundPayClient.certificateExecute(request);
+            AlipayFundTransUniTransferResponse response = execute(request);
 
             log.info("支付宝单笔转账完成 - 商户订单号: {}, 响应码: {}, 响应消息: {}, 转账状态: {}",
                     outBizNo, response.getCode(), response.getMsg(), response.getStatus());
@@ -94,7 +110,7 @@ public class AlipayFundService {
 
         try {
             request.setBizModel(model);
-            AlipayFundTransCommonQueryResponse response = fundPayClient.execute(request);
+            AlipayFundTransCommonQueryResponse response = execute(request);
 
             log.info("支付宝转账查询完成 - 商户订单号: {}, 支付宝转账单据号: {}, 响应码: {}, 响应消息: {}, 转账状态: {}",
                     outBizNo, orderId, response.getCode(), response.getMsg(), response.getStatus());

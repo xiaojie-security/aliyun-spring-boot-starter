@@ -52,5 +52,10 @@ public class AliPayDetails extends AliyunBaseProperties {
      * 订单有效时间（单位：毫秒）
      */
     private Long validityTime;
+
+    /**
+     * 证书模式
+     */
+    private boolean certificates;
 }
 

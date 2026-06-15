@@ -25,5 +25,10 @@ public class AliyunPay {
      * 扫码支付
      */
     private AliPayDetails scanCode;
+
+    /**
+     * oauth授权认证
+     */
+    private AliPayDetails oauth;
 }
 

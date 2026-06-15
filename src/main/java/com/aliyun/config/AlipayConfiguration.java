@@ -1,12 +1,9 @@
 package com.aliyun.config;
 
 import com.alipay.api.AlipayApiException;
-import com.alipay.api.AlipayConfig;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.v3.ApiException;
-import com.aliyun.core.pay.AlipayFundService;
-import com.aliyun.core.pay.AppAliPayService;
-import com.aliyun.core.pay.ScanCodeAliPayService;
+import com.aliyun.core.pay.*;
 import com.aliyun.model.AliPayDetails;
 import com.aliyun.properties.AliyunProperties;
 import com.aliyun.properties.pojo.AliyunPay;
@@ -56,48 +53,47 @@ public class AlipayConfiguration implements InitializingBean {
 
     @Bean
     @ConditionalOnProperty(prefix = "aliyun.pay.scan-code", name = "enable", havingValue = "true")
-    public ScanCodeAliPayService scanCodeAliyunPayService(com.alipay.v3.ApiClient scanCodePayClient) {
-        return new ScanCodeAliPayService(scanCodePayClient,aliyunPay.getScanCode());
+    public AliPayScanCodeService scanCodeAliyunPayService(com.alipay.v3.ApiClient scanCodePayClient) {
+        return new AliPayScanCodeService(scanCodePayClient,aliyunPay.getScanCode());
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "aliyun.pay.app", name = "enable", havingValue = "true")
-    public AppAliPayService appAliPayService() throws AlipayApiException {
-        AliPayDetails app = aliyunPay.getApp();
-        AlipayConfig alipayConfig = new AlipayConfig();
-        if (app != null) {
-            alipayConfig.setServerUrl(app.getGateWay());
-            alipayConfig.setAppId(app.getAppId());
-            alipayConfig.setFormat(FORMAT);
-            alipayConfig.setAlipayPublicKey(app.getPublicKey());
-            alipayConfig.setPrivateKey(app.getPrivateKey());
-            alipayConfig.setAppCertPath(app.getAppCertPath());
-            alipayConfig.setAlipayPublicCertPath(app.getAlipayPublicCertPath());
-            alipayConfig.setRootCertPath(app.getRootCertPath());
-            alipayConfig.setCharset(CHARSET);
-            alipayConfig.setSignType(SIGN_TYPE);
-        }
-        return new AppAliPayService(new DefaultAlipayClient(alipayConfig),aliyunPay.getApp());
+    public AliPayAppService appAliPayService() throws AlipayApiException {
+        return new AliPayAppService(new DefaultAlipayClient(createAlipayConfig(aliyunPay.getApp())),aliyunPay.getApp());
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "aliyun.pay.oauth2", name = "enable", havingValue = "true")
+    public AliPayOAuth2Service aliPayOAuth2Service() throws AlipayApiException {
+        return new AliPayOAuth2Service(new DefaultAlipayClient(createAlipayConfig(aliyunPay.getOauth())), aliyunPay.getOauth());
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "aliyun.pay.fund", name = "enable", havingValue = "true")
     public AlipayFundService alipayFundService() throws AlipayApiException{
-        AliPayDetails fund = aliyunPay.getFund();
-        AlipayConfig alipayConfig = new AlipayConfig();
-        if (fund != null) {
-            alipayConfig.setServerUrl(fund.getGateWay());
-            alipayConfig.setAppId(fund.getAppId());
+        return new AlipayFundService(new DefaultAlipayClient(createAlipayConfig(aliyunPay.getFund())), aliyunPay.getFund());
+    }
+
+
+
+    public com.alipay.api.AlipayConfig createAlipayConfig(AliPayDetails details) {
+        com.alipay.api.AlipayConfig alipayConfig = new com.alipay.api.AlipayConfig();
+        if (details != null) {
+            alipayConfig.setServerUrl(details.getGateWay());
+            alipayConfig.setAppId(details.getAppId());
             alipayConfig.setFormat(FORMAT);
-            alipayConfig.setAlipayPublicKey(fund.getPublicKey());
-            alipayConfig.setPrivateKey(fund.getPrivateKey());
-            alipayConfig.setAppCertPath(fund.getAppCertPath());
-            alipayConfig.setAlipayPublicCertPath(fund.getAlipayPublicCertPath());
-            alipayConfig.setRootCertPath(fund.getRootCertPath());
+            alipayConfig.setPrivateKey(details.getPrivateKey());
+            if (details.isCertificates()) {
+                alipayConfig.setAppCertPath(details.getAppCertPath());
+                alipayConfig.setAlipayPublicCertPath(details.getAlipayPublicCertPath());
+                alipayConfig.setRootCertPath(details.getRootCertPath());
+            }
+            alipayConfig.setAlipayPublicKey(details.getPublicKey());
             alipayConfig.setCharset(CHARSET);
             alipayConfig.setSignType(SIGN_TYPE);
         }
-        return new AlipayFundService(new DefaultAlipayClient(alipayConfig));
+        return alipayConfig;
     }
 
 

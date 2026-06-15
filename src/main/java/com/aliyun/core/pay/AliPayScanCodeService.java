@@ -22,7 +22,7 @@ import java.util.Map;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class ScanCodeAliPayService {
+public class AliPayScanCodeService {
     private final com.alipay.v3.ApiClient payClient;
     private final AliPayDetails aliPayDetails;
     public static final String ALIPAY_TRADE_PAGE_PAY = "alipay.trade.page.pay";

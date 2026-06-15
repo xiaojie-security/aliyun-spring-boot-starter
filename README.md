@@ -115,8 +115,8 @@
 
 核心服务：
 
-- `com.aliyun.core.pay.AppAliPayService`
-- `com.aliyun.core.pay.ScanCodeAliPayService`
+- `com.aliyun.core.pay.AliPayAppService`
+- `com.aliyun.core.pay.AliPayScanCodeService`
 - `com.aliyun.core.pay.AlipayFundService`
 
 当前已封装能力：
@@ -365,7 +365,6 @@ public class SmsDemoController {
 
 ```java
 import com.aliyun.core.pns.AliyunPnsService;
-import com.aliyun.enums.AliyunPnsTemplateCode;
 import com.aliyun.model.AliyunPnsTemplateParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -384,7 +383,7 @@ public class PnsDemoController {
         return aliyunPnsService.sendSmsCode(
                 schemeName,
                 phone,
-                AliyunPnsTemplateCode.LOGIN_REGISTER,
+                "SMS_123456789",
                 param
         );
     }
@@ -394,7 +393,6 @@ public class PnsDemoController {
 ### 7.4 注入 APP 支付服务
 
 ```java
-import com.aliyun.core.pay.AppAliPayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -406,11 +404,11 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class PayDemoController {
 
-    private final AppAliPayService appAliPayService;
+    private final AliPayAppService aliPayAppService;
 
     @GetMapping("/demo/pay/app")
     public String createOrder(@RequestParam String orderNo) throws Exception {
-        return appAliPayService.generateOrderStr(
+        return aliPayAppService.generateOrderStr(
                 orderNo,
                 new BigDecimal("0.01"),
                 "测试订单",
@@ -421,30 +419,9 @@ public class PayDemoController {
 }
 ```
 
-## 8. 模板枚举说明
+## 8. 模板编码说明
 
-项目内置了两个模板枚举，便于业务层统一引用：
-
-### 8.1 短信模板枚举
-
-- `AliyunSmsTemplateCode.LOGIN_REGISTER`
-- `AliyunSmsTemplateCode.CHANGE_PHONE`
-- `AliyunSmsTemplateCode.PASSWORD_RESET`
-- `AliyunSmsTemplateCode.BIND_PHONE`
-- `AliyunSmsTemplateCode.VERIFY_BIND_PHONE`
-
-### 8.2 PNS 模板枚举
-
-- `AliyunPnsTemplateCode.LOGIN_REGISTER`
-- `AliyunPnsTemplateCode.CHANGE_PHONE`
-- `AliyunPnsTemplateCode.PASSWORD_RESET`
-- `AliyunPnsTemplateCode.BIND_PHONE`
-- `AliyunPnsTemplateCode.VERIFY_BIND_PHONE`
-
-注意：
-
-- 枚举中的 `templateCode` 是项目内约定值
-- 实际云上模板编码仍需在配置文件的 `template-codes` 中维护
+短信与 PNS 服务现在直接使用云上模板编码字符串，由业务方自行传入具体的 `templateCode`。
 
 ## 9. 目录结构
 

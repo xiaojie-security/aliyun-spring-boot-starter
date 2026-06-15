@@ -1,5 +1,6 @@
 package com.aliyun.properties.pojo;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.*;
 
@@ -31,7 +32,7 @@ public class AliyunSms extends AliyunBaseProperties {
     /**
      * 短信签名映射
      */
-    private List<String> signNames;
+    private Map<String, String> signNames;
 
     /**
      * 默认签名
@@ -39,29 +40,21 @@ public class AliyunSms extends AliyunBaseProperties {
     private String defaultSignName;
 
     /**
-     * 模板编码列表
-     */
-    private Map<String,String> templateCodes;
-
-    /**
      * STS认证凭证使用 RAM 角色资源描述符（ARN）
      * 指定要扮演的 RAM 角色，用于获取临时安全凭证
      */
     private String ramRoleArn;
 
-    /**
-     * 获取模板编码
-     * @param templateCodeKey 模板编码的 key
-     * @return 模板编码
-     */
-    public String getTemplateCode(String templateCodeKey) {
-        String code = templateCodes.get(templateCodeKey);
-        if (StrUtil.isEmpty(code)) {
-            throw new RuntimeException("模板编码不存在");
-        }
-        return code;
+    public String getSignName() {
+        return defaultSignName;
     }
 
+    public String getSignName(String signKey) {
+        if (CollUtil.isEmpty(signNames)) {
+            return defaultSignName;
+        }
+        return signNames.getOrDefault(signKey, defaultSignName);
+    }
 
 }
 

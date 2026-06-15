@@ -1,6 +1,5 @@
 package com.aliyun.core.pns;
 
-import com.aliyun.enums.AliyunPnsTemplateCode;
 import com.aliyun.model.AliyunPnsTemplateParam;
 
 public interface AliyunPnsService {
@@ -9,10 +8,10 @@ public interface AliyunPnsService {
      * 发送短信
      * @param schemeName 方案名称
      * @param phoneNumber 短信接收手机号
-     * @param aliyunPnsTemplateCode 短信模板
+     * @param templateCode 短信模板
      * @return 短信发送结果
      */
-    boolean sendSmsCode(String schemeName, String phoneNumber, AliyunPnsTemplateCode aliyunPnsTemplateCode, AliyunPnsTemplateParam aliyunPnsTemplateParam);
+    boolean sendSmsCode(String schemeName, String phoneNumber, String templateCode, AliyunPnsTemplateParam aliyunPnsTemplateParam);
 
 
     /**

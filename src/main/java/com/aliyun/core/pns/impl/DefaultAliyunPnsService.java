@@ -7,13 +7,9 @@ import com.aliyun.core.pns.AliyunPnsService;
 import com.aliyun.dypnsapi20170525.models.CheckSmsVerifyCodeResponseBody;
 import com.aliyun.properties.pojo.AliyunPns;
 import com.aliyun.tea.*;
-import com.aliyun.enums.AliyunPnsTemplateCode;
 import com.aliyun.model.AliyunPnsTemplateParam;
-import com.aliyun.properties.AliyunProperties;
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
 
 /**
  * 阿里云号码认证服务
@@ -65,7 +61,7 @@ public class DefaultAliyunPnsService implements AliyunPnsService {
     private final com.aliyun.dypnsapi20170525.Client client;
 
     @Override
-    public boolean sendSmsCode(String schemeName,String phoneNumber, AliyunPnsTemplateCode aliyunPnsTemplateCode, AliyunPnsTemplateParam aliyunPnsTemplateParam) {
+    public boolean sendSmsCode(String schemeName,String phoneNumber, String templateCode, AliyunPnsTemplateParam aliyunPnsTemplateParam) {
         if(StrUtil.isEmpty(phoneNumber)) {
             log.warn("DefaultAliyunPnsService smsCodeSend 手机号不能为空");
             throw new IllegalArgumentException("手机号不能为空");
@@ -78,7 +74,7 @@ public class DefaultAliyunPnsService implements AliyunPnsService {
         com.aliyun.dypnsapi20170525.models.SendSmsVerifyCodeRequest sendSmsVerifyCodeRequest = new com.aliyun.dypnsapi20170525.models.SendSmsVerifyCodeRequest()
                 .setCountryCode(COUNTRY_CODE)
                 .setPhoneNumber(phoneNumber)
-                .setTemplateCode(aliyunPnsTemplateCode.getTemplateCode())
+                .setTemplateCode(templateCode)
                 .setTemplateParam(JSONUtil.toJsonStr(aliyunPnsTemplateParam))
                 .setSchemeName(schemeName)
                 .setSignName(pns.getSignName())

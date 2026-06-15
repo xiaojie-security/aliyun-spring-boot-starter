@@ -246,13 +246,8 @@ aliyun:
     region: cn-hangzhou
     default-sign-name: 示例签名
     sign-names:
-      - 示例签名
-    template-codes:
-      login_register: SMS_000000001
-      change_phone: SMS_000000002
-      password_reset: SMS_000000003
-      bind_phone: SMS_000000004
-      verify_bind_phone: SMS_000000005
+      login_register: 示例签名
+      change_phone: 备用签名
     ram-role-arn: acs:ram::xxxx:role/your-role
 
   pns:
@@ -271,11 +266,23 @@ aliyun:
       gate-way: https://openapi.alipay.com/gateway.do
       private-key: your-private-key
       public-key: your-public-key
+      certificates: false
       app-cert-path: cert/appCertPublicKey.crt
       alipay-public-cert-path: cert/alipayCertPublicKey_RSA2.crt
       root-cert-path: cert/alipayRootCert.crt
       seller-id: your-seller-id
       validity-time: 1800000
+
+    oauth:
+      enable: true
+      app-id: your-app-id
+      gate-way: https://openapi.alipay.com/gateway.do
+      private-key: your-private-key
+      public-key: your-public-key
+      certificates: false
+      app-cert-path: cert/appCertPublicKey.crt
+      alipay-public-cert-path: cert/alipayCertPublicKey_RSA2.crt
+      root-cert-path: cert/alipayRootCert.crt
 
     fund:
       enable: false
@@ -283,6 +290,7 @@ aliyun:
       gate-way: https://openapi.alipay.com/gateway.do
       private-key: your-private-key
       public-key: your-public-key
+      certificates: false
       app-cert-path: cert/appCertPublicKey.crt
       alipay-public-cert-path: cert/alipayCertPublicKey_RSA2.crt
       root-cert-path: cert/alipayRootCert.crt
@@ -293,6 +301,7 @@ aliyun:
       gate-way: https://openapi.alipay.com/gateway.do
       private-key: your-private-key
       public-key: your-public-key
+      certificates: false
       seller-id: your-seller-id
 ```
 

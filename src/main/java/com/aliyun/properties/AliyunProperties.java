@@ -1,6 +1,7 @@
 package com.aliyun.properties;
 
 
+import com.aliyun.model.AliPayDetails;
 import com.aliyun.model.AliyunCredential;
 import com.aliyun.properties.pojo.*;
 import lombok.Data;
@@ -35,7 +36,7 @@ public class AliyunProperties implements InitializingBean {
      * 支付服务配置
      * 用于配置支付宝支付服务
      */
-    private AliyunPay pay;
+    private AliPay pay;
 
     /**
      * 短信服务配置
@@ -73,15 +74,14 @@ public class AliyunProperties implements InitializingBean {
         }
 
         if (pay != null) {
-            if (pay.getScanCode() != null) {
-                log.info("PAY 支付宝扫码支付服务: {}", pay.getScanCode().isEnable() ? "已开启" : "已关闭");
-            }
-            if (pay.getFund() != null) {
-                log.info("PAY 支付宝转账服务: {}", pay.getFund().isEnable() ? "已开启" : "已关闭");
-            }
-            if (pay.getApp() != null) {
-                log.info("PAY 支付宝APP支付服务: {}", pay.getApp().isEnable() ? "已开启" : "已关闭");
-            }
+            AliPayDetails scanCode = pay.getScanCode();
+            AliPayDetails fund = pay.getFund();
+            AliPayDetails app = pay.getApp();
+            AliPayDetails oauth = pay.getOauth();
+            log.info("PAY 支付宝扫码支付服务: {}", scanCode.isEnable() ? "已开启" : "已关闭");
+            log.info("PAY 支付宝转账服务: {}", fund.isEnable() ? "已开启" : "已关闭");
+            log.info("PAY 支付宝APP支付服务: {}", app.isEnable() ? "已开启" : "已关闭");
+            log.info("PAY 支付宝OAuth服务: {}", oauth.isEnable() ? "已开启" : "已关闭");
         }
 
         if (sms != null) {
@@ -108,4 +108,3 @@ public class AliyunProperties implements InitializingBean {
     }
 
 }
-

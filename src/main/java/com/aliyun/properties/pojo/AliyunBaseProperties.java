@@ -7,8 +7,8 @@ public class AliyunBaseProperties {
 
     /**
      * 是否开启服务
-     * */
-    private boolean enable = false;
+     */
+    private Boolean enable;
 
     /**
      * 阿里云访问密钥 ID
@@ -21,5 +21,13 @@ public class AliyunBaseProperties {
      * 用于签名验证的密钥信息
      */
     private String accessKeySecret;
-}
 
+    /**
+     * 是否开启服务。
+     *
+     * @return true-开启，false-未开启
+     */
+    public boolean isEnable() {
+        return Boolean.TRUE.equals(enable);
+    }
+}

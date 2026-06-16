@@ -6,7 +6,7 @@ import com.alipay.v3.ApiException;
 import com.aliyun.core.pay.*;
 import com.aliyun.model.AliPayDetails;
 import com.aliyun.properties.AliyunProperties;
-import com.aliyun.properties.pojo.AliyunPay;
+import com.aliyun.properties.pojo.AliPay;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,17 +24,17 @@ public class AlipayConfiguration implements InitializingBean {
     public static final String CHARSET = "UTF-8";
     public static final String SIGN_TYPE = "RSA2";
     private final AliyunProperties aliyunProperties;
-    private AliyunPay aliyunPay;
+    private AliPay aliPay;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        aliyunPay = aliyunProperties.getPay();
+        aliPay = aliyunProperties.getPay();
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "aliyun.pay.scan-code", name = "enable", havingValue = "true")
     public com.alipay.v3.ApiClient scanCodePayClient() {
-        AliPayDetails scanCode = aliyunPay.getScanCode();
+        AliPayDetails scanCode = aliPay.getScanCode();
         com.alipay.v3.ApiClient apiClient = com.alipay.v3.Configuration.getDefaultApiClient();
         try {
             com.alipay.v3.util.model.AlipayConfig alipayConfig = new com.alipay.v3.util.model.AlipayConfig();
@@ -53,26 +53,29 @@ public class AlipayConfiguration implements InitializingBean {
 
     @Bean
     @ConditionalOnProperty(prefix = "aliyun.pay.scan-code", name = "enable", havingValue = "true")
-    public AliPayScanCodeService scanCodeAliyunPayService(com.alipay.v3.ApiClient scanCodePayClient) {
-        return new AliPayScanCodeService(scanCodePayClient,aliyunPay.getScanCode());
+    public AliPayScanCodeService scanCodeAliyunPayService() {
+        return new AliPayScanCodeService(scanCodePayClient(), aliPay.getScanCode());
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "aliyun.pay.app", name = "enable", havingValue = "true")
     public AliPayAppService appAliPayService() throws AlipayApiException {
-        return new AliPayAppService(new DefaultAlipayClient(createAlipayConfig(aliyunPay.getApp())),aliyunPay.getApp());
+        AliPayDetails appDetails = aliPay.getApp();
+        return new AliPayAppService(new DefaultAlipayClient(createAlipayConfig(appDetails)), appDetails);
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "aliyun.pay.oauth2", name = "enable", havingValue = "true")
     public AliPayOAuth2Service aliPayOAuth2Service() throws AlipayApiException {
-        return new AliPayOAuth2Service(new DefaultAlipayClient(createAlipayConfig(aliyunPay.getOauth())), aliyunPay.getOauth());
+        AliPayDetails oauthDetails = aliPay.getOauth();
+        return new AliPayOAuth2Service(new DefaultAlipayClient(createAlipayConfig(oauthDetails)), oauthDetails);
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "aliyun.pay.fund", name = "enable", havingValue = "true")
     public AlipayFundService alipayFundService() throws AlipayApiException{
-        return new AlipayFundService(new DefaultAlipayClient(createAlipayConfig(aliyunPay.getFund())), aliyunPay.getFund());
+        AliPayDetails fundDetails = aliPay.getFund();
+        return new AlipayFundService(new DefaultAlipayClient(createAlipayConfig(fundDetails)), fundDetails);
     }
 
 
@@ -88,8 +91,9 @@ public class AlipayConfiguration implements InitializingBean {
                 alipayConfig.setAppCertPath(details.getAppCertPath());
                 alipayConfig.setAlipayPublicCertPath(details.getAlipayPublicCertPath());
                 alipayConfig.setRootCertPath(details.getRootCertPath());
+            } else {
+                alipayConfig.setAlipayPublicKey(details.getPublicKey());
             }
-            alipayConfig.setAlipayPublicKey(details.getPublicKey());
             alipayConfig.setCharset(CHARSET);
             alipayConfig.setSignType(SIGN_TYPE);
         }

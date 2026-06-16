@@ -3,7 +3,7 @@ package com.aliyun.utils;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
-import com.aliyun.model.AliPayDetails;
+import com.aliyun.model.AliPayCallbackResult;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +24,7 @@ public final class AlipayUtils {
      * @param alipayPublicCertPath 支付宝公钥证书路径
      * @return 验证成功返回参数字典；验证失败或异常返回null
      */
-    public static Map<String, String> rsaCertCheck(HttpServletRequest request, String alipayPublicCertPath)  {
+    public static AliPayCallbackResult rsaCertCheck(HttpServletRequest request, String alipayPublicCertPath)  {
         try {
             Map<String, String> params = extractParams(request);
             boolean signVerified = AlipaySignature.rsaCertCheckV1(params, alipayPublicCertPath, CHARSET, SIGN_TYPE);  //调用SDK验证签名
@@ -32,7 +32,7 @@ public final class AlipayUtils {
                 log.error("AlipayUtils rsaCertCheck 验证支付宝异步回调签名失败");
                 return null;
             }
-            return params;
+            return new AliPayCallbackResult(params);
         } catch (AlipayApiException e) {
             log.error("AlipayUtils rsaCertCheck 验证支付宝异步回调签名异常, alipayPublicCertPath={}", alipayPublicCertPath, e);
             return null;
@@ -46,7 +46,7 @@ public final class AlipayUtils {
      * @param alipayPublicKey 支付宝公钥
      * @return 验证成功返回参数字典；验证失败或异常返回null
      */
-    public static Map<String, String> rsaCheck(HttpServletRequest request, String alipayPublicKey)  {
+    public static AliPayCallbackResult rsaCheck(HttpServletRequest request, String alipayPublicKey)  {
         try {
             Map<String, String> params = extractParams(request);
             boolean signVerified = AlipaySignature.rsaCheckV1(params, alipayPublicKey, CHARSET, SIGN_TYPE);
@@ -54,7 +54,7 @@ public final class AlipayUtils {
                 log.error("AlipayUtils rsaCheck 验证支付宝异步回调签名失败");
                 return null;
             }
-            return params;
+            return new AliPayCallbackResult(params);
         } catch (AlipayApiException e) {
             log.error("AlipayUtils rsaCheck 验证支付宝异步回调签名异常, alipayPublicKey={}", alipayPublicKey, e);
             return null;

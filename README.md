@@ -260,48 +260,35 @@ aliyun:
     ram-role-arn: acs:ram::xxxx:role/your-role
 
   pay:
+    enable: true
+    access-key-id: your-access-key-id
+    access-key-secret: your-access-key-secret
+    app-id: your-common-app-id
+    gate-way: https://openapi.alipay.com/gateway.do
+    private-key: your-common-private-key
+    public-key: your-common-public-key
+    certificates: false
+    app-cert-path: cert/appCertPublicKey.crt
+    alipay-public-cert-path: cert/alipayCertPublicKey_RSA2.crt
+    root-cert-path: cert/alipayRootCert.crt
+    seller-id: your-common-seller-id
+    validity-time: 1800000
+
     app:
       enable: true
-      app-id: your-app-id
-      gate-way: https://openapi.alipay.com/gateway.do
-      private-key: your-private-key
-      public-key: your-public-key
-      certificates: false
-      app-cert-path: cert/appCertPublicKey.crt
-      alipay-public-cert-path: cert/alipayCertPublicKey_RSA2.crt
-      root-cert-path: cert/alipayRootCert.crt
-      seller-id: your-seller-id
-      validity-time: 1800000
+      app-id: your-app-specific-app-id
 
     oauth:
       enable: true
-      app-id: your-app-id
-      gate-way: https://openapi.alipay.com/gateway.do
-      private-key: your-private-key
-      public-key: your-public-key
-      certificates: false
-      app-cert-path: cert/appCertPublicKey.crt
-      alipay-public-cert-path: cert/alipayCertPublicKey_RSA2.crt
-      root-cert-path: cert/alipayRootCert.crt
+      app-id: your-oauth-specific-app-id
 
     fund:
       enable: false
-      app-id: your-app-id
-      gate-way: https://openapi.alipay.com/gateway.do
-      private-key: your-private-key
-      public-key: your-public-key
-      certificates: false
-      app-cert-path: cert/appCertPublicKey.crt
-      alipay-public-cert-path: cert/alipayCertPublicKey_RSA2.crt
-      root-cert-path: cert/alipayRootCert.crt
+      app-id: your-fund-specific-app-id
 
     scan-code:
       enable: false
-      app-id: your-app-id
-      gate-way: https://openapi.alipay.com/gateway.do
-      private-key: your-private-key
-      public-key: your-public-key
-      certificates: false
+      app-id: your-scan-specific-app-id
       seller-id: your-seller-id
 ```
 
@@ -317,11 +304,56 @@ aliyun:
 - `aliyun.pay.app`
 - `aliyun.pay.fund`
 - `aliyun.pay.scan-code`
+- `aliyun.pay.oauth`
 
 公共字段：
 
 - `enable`：是否启用当前能力
 - `accessKeyId` / `accessKeySecret`：阿里云访问密钥
+
+说明：
+
+- `aliyun.pay` 提供公共配置
+- `aliyun.pay.app`、`aliyun.pay.fund`、`aliyun.pay.scan-code`、`aliyun.pay.oauth` 提供各自专属配置
+- 子配置未填写的字段会自动回退到 `aliyun.pay` 的公共配置
+
+### 6.3 支付宝配置优先级说明
+
+支付宝配置支持“公共一套 + 子服务各自覆盖一套”的模式。
+
+推荐做法：
+
+- 把大多数共用字段配置在 `aliyun.pay`，例如 `app-id`、`gate-way`、`private-key`、`public-key`
+- 仅当某个子服务需要不同配置时，再在 `aliyun.pay.app`、`aliyun.pay.fund`、`aliyun.pay.scan-code`、`aliyun.pay.oauth` 中单独覆盖
+
+回退规则：
+
+- 如果子服务显式配置了某个字段，则优先使用子服务自己的值
+- 如果子服务没有配置该字段，则自动回退到 `aliyun.pay` 的公共值
+- `enable` 与 `certificates` 也遵循同样的回退规则
+
+示例：
+
+```yaml
+aliyun:
+  pay:
+    gate-way: https://openapi.alipay.com/gateway.do
+    private-key: your-common-private-key
+    public-key: your-common-public-key
+
+    app:
+      enable: true
+
+    fund:
+      enable: true
+      app-id: your-fund-app-id
+```
+
+上面的效果是：
+
+- `app` 会复用公共的 `gate-way`、`private-key`、`public-key`
+- `fund` 也会复用公共的 `gate-way`、`private-key`、`public-key`
+- `fund` 因为单独配置了 `app-id`，所以它的 `app-id` 只使用自己的值
 
 ## 7. 使用示例
 
@@ -364,8 +396,12 @@ public class SmsDemoController {
     private final AliyunSmsService aliyunSmsService;
 
     @PostMapping("/demo/sms")
-    public String send(@RequestParam String phone) {
-        return aliyunSmsService.sendSmsCaptcha(phone, "login_register");
+    public boolean send(@RequestParam String phone) {
+        return aliyunSmsService.sendSmsCode(
+                phone,
+                "SMS_123456789",
+                Map.of("code", "123456")
+        );
     }
 }
 ```

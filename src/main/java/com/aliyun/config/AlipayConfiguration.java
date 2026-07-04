@@ -10,6 +10,7 @@ import com.aliyun.properties.AliyunProperties;
 import com.aliyun.properties.pojo.AliPay;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +34,7 @@ public class AlipayConfiguration implements InitializingBean {
     }
 
     @Bean
+    @ConditionalOnMissingBean(com.alipay.v3.ApiClient.class)
     @ConditionalOnProperty(prefix = "aliyun.pay.scan-code", name = "enable", havingValue = "true")
     public com.alipay.v3.ApiClient scanCodePayClient() throws ApiException {
         com.alipay.v3.ApiClient apiClient = com.alipay.v3.Configuration.getDefaultApiClient();
@@ -41,12 +43,14 @@ public class AlipayConfiguration implements InitializingBean {
     }
 
     @Bean
+    @ConditionalOnMissingBean(AliPayScanCodeService.class)
     @ConditionalOnProperty(prefix = "aliyun.pay.scan-code", name = "enable", havingValue = "true")
-    public AliPayScanCodeService scanCodeAliyunPayService() throws ApiException {
-        return new AliPayScanCodeService(scanCodePayClient(), aliPay.getScanCode());
+    public AliPayScanCodeService scanCodeAliyunPayService(com.alipay.v3.ApiClient scanCodePayClient) {
+        return new AliPayScanCodeService(scanCodePayClient, aliPay.getScanCode());
     }
 
     @Bean
+    @ConditionalOnMissingBean(AliPayAppService.class)
     @ConditionalOnProperty(prefix = "aliyun.pay.app", name = "enable", havingValue = "true")
     public AliPayAppService appAliPayService() throws AlipayApiException {
         AliPayDetails appDetails = aliPay.getApp();
@@ -54,6 +58,7 @@ public class AlipayConfiguration implements InitializingBean {
     }
 
     @Bean
+    @ConditionalOnMissingBean(AliPayOAuth2Service.class)
     @ConditionalOnProperty(prefix = "aliyun.pay.oauth", name = "enable", havingValue = "true")
     public AliPayOAuth2Service aliPayOAuth2Service() throws AlipayApiException {
         AliPayDetails oauthDetails = aliPay.getOauth();
@@ -61,6 +66,7 @@ public class AlipayConfiguration implements InitializingBean {
     }
 
     @Bean
+    @ConditionalOnMissingBean(AlipayFundService.class)
     @ConditionalOnProperty(prefix = "aliyun.pay.fund", name = "enable", havingValue = "true")
     public AlipayFundService alipayFundService() throws AlipayApiException{
         AliPayDetails fundDetails = aliPay.getFund();

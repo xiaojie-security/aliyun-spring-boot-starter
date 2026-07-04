@@ -5,6 +5,7 @@ import com.aliyun.properties.AliyunProperties;
 import com.aliyun.properties.pojo.AliyunSts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +26,7 @@ public class AliyunStsConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean
+    @ConditionalOnMissingBean(com.aliyun.sts20150401.Client.class)
     public com.aliyun.sts20150401.Client client() throws Exception {
         if (sts == null) {
             return null;
@@ -37,8 +39,9 @@ public class AliyunStsConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean
-    public AliyunStsService aliyunStsService() throws Exception {
-        return new AliyunStsService(sts,client());
+    @ConditionalOnMissingBean(AliyunStsService.class)
+    public AliyunStsService aliyunStsService(com.aliyun.sts20150401.Client client) {
+        return new AliyunStsService(sts, client);
     }
 
 }

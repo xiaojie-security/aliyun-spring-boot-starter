@@ -8,6 +8,7 @@ import com.aliyun.properties.AliyunProperties;
 import com.aliyun.properties.pojo.AliyunPns;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,7 @@ public class AliyunPnsConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean("aliyunPnsClient")
+    @ConditionalOnMissingBean(com.aliyun.dypnsapi20170525.Client.class)
     public com.aliyun.dypnsapi20170525.Client client() throws Exception {
         if (pns == null) {
             return null;
@@ -44,7 +46,8 @@ public class AliyunPnsConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean
-    public AliyunPnsService aliyunPnsService() throws Exception {
-        return new DefaultAliyunPnsService(pns,client());
+    @ConditionalOnMissingBean(AliyunPnsService.class)
+    public AliyunPnsService aliyunPnsService(com.aliyun.dypnsapi20170525.Client aliyunPnsClient) {
+        return new DefaultAliyunPnsService(pns, aliyunPnsClient);
     }
 }

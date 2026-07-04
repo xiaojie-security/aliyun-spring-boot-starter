@@ -16,6 +16,7 @@ import com.aliyun.sdk.service.oss2.credentials.CredentialsProvider;
 import com.aliyun.sdk.service.oss2.credentials.CredentialsProviderSupplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +40,7 @@ public class AliyunOssConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean
+    @ConditionalOnMissingBean(OSSClient.class)
     public OSSClient ossV2Client() throws Exception {
         if (oss == null) {
             return null;
@@ -66,6 +68,7 @@ public class AliyunOssConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean
+    @ConditionalOnMissingBean(com.aliyun.oss.OSS.class)
     public com.aliyun.oss.OSS ossClient() throws Exception {
         if (oss == null) {
             return null;
@@ -101,6 +104,7 @@ public class AliyunOssConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean
+    @ConditionalOnMissingBean(AliyunOssService.class)
     public AliyunOssService aliyunOssService(OSSClient ossV2Client, com.aliyun.oss.OSS ossClient) {
         return new DefaultAliyunOssService(ossV2Client, ossClient, oss);
     }

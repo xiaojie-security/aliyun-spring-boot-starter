@@ -7,6 +7,7 @@ import com.aliyun.properties.pojo.AliyunSms;
 import com.aliyun.teaopenapi.models.Config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,7 @@ public class AliyunSmsConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean("aliyunSmsClient")
+    @ConditionalOnMissingBean(com.aliyun.dysmsapi20170525.Client.class)
     public com.aliyun.dysmsapi20170525.Client client() throws Exception{
         Config config = createOpenApiConfig(credential);
         config.endpoint = sms.getEndpoint();
@@ -37,7 +39,8 @@ public class AliyunSmsConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean
-    public AliyunSmsService aliyunSmsService() throws Exception {
-        return new AliyunSmsService(sms,client());
+    @ConditionalOnMissingBean(AliyunSmsService.class)
+    public AliyunSmsService aliyunSmsService(com.aliyun.dysmsapi20170525.Client aliyunSmsClient) {
+        return new AliyunSmsService(sms, aliyunSmsClient);
     }
 }

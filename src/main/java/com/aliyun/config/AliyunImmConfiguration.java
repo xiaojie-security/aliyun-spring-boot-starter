@@ -7,6 +7,7 @@ import com.aliyun.properties.AliyunProperties;
 import com.aliyun.properties.pojo.AliyunImm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,7 @@ public class AliyunImmConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean
+    @ConditionalOnMissingBean(com.aliyun.imm20200930.Client.class)
     public com.aliyun.imm20200930.Client immClient() throws Exception {
         if (imm == null) {
             return null;
@@ -41,6 +43,7 @@ public class AliyunImmConfiguration extends AliyunBaseConfiguration implements I
     }
 
     @Bean
+    @ConditionalOnMissingBean(AliyunImmService.class)
     public AliyunImmService aliyunImmService(com.aliyun.imm20200930.Client immClient) {
         return new DefaultAliyunImmService(imm, immClient);
     }

@@ -1,6 +1,10 @@
-package com.aliyun.properties.pojo;
+package com.aliyun.properties;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * 阿里云号码认证服务配置类
@@ -12,7 +16,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class AliyunPns extends AliyunBaseProperties {
+@ConfigurationProperties(prefix = "aliyun.pns")
+@Component
+@Slf4j
+public class AliyunPnsProperties extends AliyunBaseProperties implements InitializingBean {
 
     /**
      * 签名
@@ -35,6 +42,12 @@ public class AliyunPns extends AliyunBaseProperties {
      */
     private String ramRoleArn;
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (isEnable()) {
+            log.debug("AliyunPnsProperties.afterPropertiesSet PNS号码认证");
+        }
+    }
 
 }
 

@@ -3,13 +3,13 @@ package com.aliyun.config;
 import com.aliyun.core.oss.AliyunOssService;
 import com.aliyun.core.oss.impl.DefaultAliyunOssService;
 import com.aliyun.credentials.models.CredentialModel;
-import com.aliyun.model.AliyunCredential;
+import com.aliyun.config.domain.AliyunCredential;
 import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.common.auth.DefaultCredentials;
 import com.aliyun.oss.common.comm.SignVersion;
-import com.aliyun.properties.AliyunProperties;
-import com.aliyun.properties.pojo.AliyunOss;
+import com.aliyun.properties.AliyunOssProperties;
+import com.aliyun.properties.AliyunStsProperties;
 import com.aliyun.sdk.service.oss2.OSSClient;
 import com.aliyun.sdk.service.oss2.credentials.Credentials;
 import com.aliyun.sdk.service.oss2.credentials.CredentialsProvider;
@@ -27,17 +27,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "aliyun.oss", name = "enable", havingValue = "true")
-public class AliyunOssConfiguration extends AliyunBaseConfiguration implements InitializingBean {
+public class AliyunOssConfiguration extends AliyunBaseConfiguration {
 
-    private final AliyunProperties aliyunProperties;
-    private AliyunOss oss;
-    private AliyunCredential credential;
+    private final AliyunOssProperties oss;
+    private final AliyunCredential credential;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        oss = aliyunProperties.getOss();
-        credential = aliyunProperties.createStsCredential(oss.getRamRoleArn());
-    }
 
     @Bean
     @ConditionalOnMissingBean(OSSClient.class)

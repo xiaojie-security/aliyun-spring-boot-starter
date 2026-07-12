@@ -24,7 +24,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AliPayScanCodeService {
     private final com.alipay.v3.ApiClient payClient;
-    private final AliPayDetails aliPayDetails;
     public static final String ALIPAY_TRADE_PAGE_PAY = "alipay.trade.page.pay";
 
     public String payment(String out_trade_no, BigDecimal total_amount, String subject, GoodsDetail[] goodsDetails) {
@@ -38,7 +37,7 @@ public class AliPayScanCodeService {
         try {
             return api.pageExecute(ALIPAY_TRADE_PAGE_PAY, "POST", bizParams);
         } catch (ApiException e) {
-            log.error("统一下单并支付异常：{}", e.getMessage());
+            log.error("AliPayScanCodeService.payment 统一下单并支付异常：{}", e.getMessage());
             throw new AliyunException(e.getMessage());
         }
     }
@@ -58,7 +57,7 @@ public class AliPayScanCodeService {
             return api.query(data);
         } catch (ApiException e) {
             AlipayTradeQueryDefaultResponse errorObject = (AlipayTradeQueryDefaultResponse) e.getErrorObject();
-            log.error("交易查询失败 订单号：{} 失败原因：{}",out_trade_no,errorObject.getAlipayTradeQueryErrorResponseModel().getMessage());
+            log.error("AliPayScanCodeService.query 交易查询失败 订单号：{} 失败原因：{}",out_trade_no,errorObject.getAlipayTradeQueryErrorResponseModel().getMessage());
             return null;
         }
     }
@@ -75,7 +74,7 @@ public class AliPayScanCodeService {
             return api.close(data);
         } catch (ApiException e) {
             AlipayTradeCloseDefaultResponse errorObject = (AlipayTradeCloseDefaultResponse) e.getErrorObject();
-            log.error("关闭订单失败 订单号：{} 失败原因：{}",out_trade_no,errorObject.getAlipayTradeCloseErrorResponseModel().getMessage());
+            log.error("AliPayScanCodeService.close 关闭订单失败 订单号：{} 失败原因：{}",out_trade_no,errorObject.getAlipayTradeCloseErrorResponseModel().getMessage());
             return null;
         }
     }
@@ -99,7 +98,7 @@ public class AliPayScanCodeService {
             return api.refund(data);
         } catch (ApiException e) {
             AlipayTradeRefundDefaultResponse errorObject = (AlipayTradeRefundDefaultResponse) e.getErrorObject();
-            log.error("订单退款失败 订单号：{} 失败原因：{}", aliPayRefundParam.getOutTradeNo(),errorObject.getAlipayTradeRefundErrorResponseModel().getMessage());
+            log.error("AliPayScanCodeService.refund 订单退款失败 订单号：{} 失败原因：{}", aliPayRefundParam.getOutTradeNo(),errorObject.getAlipayTradeRefundErrorResponseModel().getMessage());
             return null;
         }
     }
@@ -118,7 +117,7 @@ public class AliPayScanCodeService {
             return api.query(data);
         } catch (ApiException e) {
             AlipayTradeFastpayRefundQueryDefaultResponse errorObject = (AlipayTradeFastpayRefundQueryDefaultResponse) e.getErrorObject();
-            log.error("退款查询失败 订单号：{} 失败原因：{}",out_request_no,errorObject.getAlipayTradeFastpayRefundQueryErrorResponseModel().getMessage());
+            log.error("AliPayScanCodeService.queryRefund 退款查询失败 订单号：{} 失败原因：{}",out_request_no,errorObject.getAlipayTradeFastpayRefundQueryErrorResponseModel().getMessage());
             return null;
         }
     }

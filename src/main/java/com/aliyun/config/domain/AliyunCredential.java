@@ -1,4 +1,4 @@
-package com.aliyun.model;
+package com.aliyun.config.domain;
 
 import lombok.*;
 

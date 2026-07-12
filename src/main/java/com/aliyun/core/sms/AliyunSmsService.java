@@ -1,19 +1,14 @@
 package com.aliyun.core.sms;
 
 import cn.hutool.core.util.PhoneUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponseBody;
-import com.aliyun.properties.pojo.AliyunSms;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.aliyun.properties.AliyunSmsProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Objects;
 
@@ -24,7 +19,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AliyunSmsService {
 
-    private final AliyunSms aliyunSms;
+    private final AliyunSmsProperties aliyunSmsProperties;
     private final com.aliyun.dysmsapi20170525.Client client;
 
 
@@ -37,7 +32,7 @@ public class AliyunSmsService {
      * @return 是否发送成功
      */
     public boolean sendSmsCode(String phoneNumber, String templateCode, Object templateParam)  {
-        return sendSmsCode(aliyunSms.getSignName(), phoneNumber, templateCode, templateParam);
+        return sendSmsCode(aliyunSmsProperties.getSignName(), phoneNumber, templateCode, templateParam);
     }
 
     /**

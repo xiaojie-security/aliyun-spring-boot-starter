@@ -3,9 +3,9 @@ package com.aliyun.config;
 import com.aliyun.core.pns.AliyunPnsService;
 import com.aliyun.core.pns.impl.DefaultAliyunPnsService;
 import com.aliyun.credentials.Client;
-import com.aliyun.model.AliyunCredential;
-import com.aliyun.properties.AliyunProperties;
-import com.aliyun.properties.pojo.AliyunPns;
+import com.aliyun.config.domain.AliyunCredential;
+import com.aliyun.properties.AliyunPnsProperties;
+import com.aliyun.properties.AliyunStsProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -19,17 +19,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "aliyun.pns", name = "enable", havingValue = "true")
-public class AliyunPnsConfiguration extends AliyunBaseConfiguration implements InitializingBean {
+public class AliyunPnsConfiguration extends AliyunBaseConfiguration {
 
-    private final AliyunProperties aliyunProperties;
-    private AliyunPns pns;
-    private AliyunCredential credential;
+    private final AliyunPnsProperties pns;
+    private final AliyunCredential credential;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        pns = aliyunProperties.getPns();
-        credential = aliyunProperties.createStsCredential(pns.getRamRoleArn());
-    }
 
     @Bean("aliyunPnsClient")
     @ConditionalOnMissingBean(com.aliyun.dypnsapi20170525.Client.class)

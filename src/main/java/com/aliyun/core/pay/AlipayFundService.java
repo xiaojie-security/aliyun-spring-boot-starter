@@ -52,7 +52,7 @@ public class AlipayFundService extends AbstractAlipayService{
      * @return 转账响应结果
      */
     public AlipayFundTransUniTransferResponse transfer(String outBizNo, String transAmount, String orderTitle, String openId, String remark) {
-        log.info("开始执行支付宝单笔转账 - 商户订单号: {}, 转账金额: {}, 订单标题: {}, 收款方openId: {}, 备注: {}",
+        log.info("AlipayFundService.transfer 开始执行支付宝单笔转账 - 商户订单号: {}, 转账金额: {}, 订单标题: {}, 收款方openId: {}, 备注: {}",
                 outBizNo, transAmount, orderTitle, openId, remark);
 
         AlipayFundTransUniTransferRequest request = new AlipayFundTransUniTransferRequest();
@@ -77,12 +77,12 @@ public class AlipayFundService extends AbstractAlipayService{
             request.setBizModel(model);
             AlipayFundTransUniTransferResponse response = execute(request);
 
-            log.info("支付宝单笔转账完成 - 商户订单号: {}, 响应码: {}, 响应消息: {}, 转账状态: {}",
+            log.info("AlipayFundService.transfer 支付宝单笔转账完成 - 商户订单号: {}, 响应码: {}, 响应消息: {}, 转账状态: {}",
                     outBizNo, response.getCode(), response.getMsg(), response.getStatus());
 
             return response;
         } catch (AlipayApiException e) {
-            log.error("支付宝单笔转账失败 - 商户订单号: {}, 转账金额: {}, 错误码: {}, 错误信息: {}, 子码: {}, 子信息: {}",
+            log.error("AlipayFundService.transfer 支付宝单笔转账失败 - 商户订单号: {}, 转账金额: {}, 错误码: {}, 错误信息: {}, 子码: {}, 子信息: {}",
                     outBizNo, transAmount, e.getErrCode(), e.getErrMsg(), e.getErrCode(), e.getErrMsg(), e);
             throw AliPayException.TRANSFER_ERROR;
         }
@@ -97,7 +97,7 @@ public class AlipayFundService extends AbstractAlipayService{
      * @return 查询响应结果
      */
     public AlipayFundTransCommonQueryResponse query(String outBizNo, String orderId, String payFundOrderId) {
-        log.info("开始查询支付宝转账结果 - 商户订单号: {}, 支付宝转账单据号: {}, 支付宝支付资金流水号: {}",
+        log.info("AlipayFundService.query 开始查询支付宝转账结果 - 商户订单号: {}, 支付宝转账单据号: {}, 支付宝支付资金流水号: {}",
                 outBizNo, orderId, payFundOrderId);
 
         AlipayFundTransCommonQueryRequest request = new AlipayFundTransCommonQueryRequest();
@@ -113,12 +113,12 @@ public class AlipayFundService extends AbstractAlipayService{
             request.setBizModel(model);
             AlipayFundTransCommonQueryResponse response = execute(request);
 
-            log.info("支付宝转账查询完成 - 商户订单号: {}, 支付宝转账单据号: {}, 响应码: {}, 响应消息: {}, 转账状态: {}",
+            log.info("AlipayFundService.query 支付宝转账查询完成 - 商户订单号: {}, 支付宝转账单据号: {}, 响应码: {}, 响应消息: {}, 转账状态: {}",
                     outBizNo, orderId, response.getCode(), response.getMsg(), response.getStatus());
 
             return response;
         } catch (AlipayApiException e) {
-            log.error("支付宝转账查询失败 - 商户订单号: {}, 支付宝转账单据号: {}, 支付宝支付资金流水号: {}, 错误码: {}, 错误信息: {}, 子码: {}, 子信息: {}",
+            log.error("AlipayFundService.query 支付宝转账查询失败 - 商户订单号: {}, 支付宝转账单据号: {}, 支付宝支付资金流水号: {}, 错误码: {}, 错误信息: {}, 子码: {}, 子信息: {}",
                     outBizNo, orderId, payFundOrderId, e.getErrCode(), e.getErrMsg(), e.getErrCode(), e.getErrMsg(), e);
             throw AliPayException.TRANSFER_ERROR;
         }

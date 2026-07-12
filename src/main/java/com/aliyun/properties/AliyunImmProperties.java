@@ -1,6 +1,10 @@
-package com.aliyun.properties.pojo;
+package com.aliyun.properties;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -12,7 +16,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class AliyunImm extends AliyunBaseProperties {
+@ConfigurationProperties(prefix = "aliyun.imm")
+@Component
+@Slf4j
+public class AliyunImmProperties extends AliyunBaseProperties implements InitializingBean {
 
     /**
      * 媒体处理项目名称
@@ -53,5 +60,12 @@ public class AliyunImm extends AliyunBaseProperties {
      * 指定要扮演的 RAM 角色，用于获取临时安全凭证
      */
     private String ramRoleArn;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (isEnable()) {
+            log.debug("AliyunImmProperties.afterPropertiesSet IMM智能媒体");
+        }
+    }
 }
 

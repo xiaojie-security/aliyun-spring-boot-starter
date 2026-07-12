@@ -1,12 +1,23 @@
-package com.aliyun.model;
+package com.aliyun.properties;
 
-import com.aliyun.properties.AliyunBaseProperties;
+
+import com.aliyun.model.AliPayDetails;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class AliPayDetails extends AliyunBaseProperties {
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@ConfigurationProperties(prefix = "aliyun.pay")
+@Component
+@Slf4j
+public abstract class AliPayBaseProperties {
 
     /**
      * 应用ID
@@ -66,4 +77,7 @@ public class AliPayDetails extends AliyunBaseProperties {
     public boolean isCertificates() {
         return Boolean.TRUE.equals(certificates);
     }
+
+    public abstract AliPayDetails getAliPayDetails();
+
 }

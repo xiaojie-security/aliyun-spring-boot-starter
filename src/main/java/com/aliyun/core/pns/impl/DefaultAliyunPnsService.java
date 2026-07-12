@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.aliyun.core.pns.AliyunPnsService;
 import com.aliyun.dypnsapi20170525.models.CheckSmsVerifyCodeResponseBody;
-import com.aliyun.properties.pojo.AliyunPns;
+import com.aliyun.properties.AliyunPnsProperties;
 import com.aliyun.tea.*;
 import com.aliyun.model.AliyunPnsTemplateParam;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +57,7 @@ public class DefaultAliyunPnsService implements AliyunPnsService {
      * 国家代码
      */
     public static final String COUNTRY_CODE = "86";
-    private final AliyunPns pns;
+    private final AliyunPnsProperties pns;
     private final com.aliyun.dypnsapi20170525.Client client;
 
     @Override

@@ -207,7 +207,7 @@ public class AlipayOAuthDemoController {
 
     @GetMapping("/demo/alipay/oauth/token")
     public AliPaySystemOauthDetails token(@RequestParam String code) {
-        return aliPayOAuth2Service.querySystemOAuthTokenByAuthorizationCode(code);
+        return aliPayOAuth2Service.getAccessTokenByCode(code);
     }
 
     @GetMapping("/demo/alipay/oauth/user")

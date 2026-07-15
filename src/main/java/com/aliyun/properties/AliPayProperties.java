@@ -1,7 +1,6 @@
 package com.aliyun.properties;
 
 
-import com.aliyun.model.AliPayDetails;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "aliyun.pay")
 @Component
 @Data
-public class AliPayProperties {
+public class AlipayProperties {
 
     /**
      * 应用ID
@@ -74,21 +73,6 @@ public class AliPayProperties {
      */
     public boolean isCertificates() {
         return Boolean.TRUE.equals(certificates);
-    }
-
-    public AliPayDetails getAliPayDetails() {
-        AliPayDetails aliPayDetails = new AliPayDetails();
-        aliPayDetails.setAppId(getAppId());
-        aliPayDetails.setGateWay(getGateWay());
-        aliPayDetails.setPrivateKey(getPrivateKey());
-        aliPayDetails.setPublicKey(getPublicKey());
-        aliPayDetails.setRootCertPath(getRootCertPath());
-        aliPayDetails.setAppCertPath(getAppCertPath());
-        aliPayDetails.setAlipayPublicCertPath(getAlipayPublicCertPath());
-        aliPayDetails.setSellerId(getSellerId());
-        aliPayDetails.setValidityTime(getValidityTime());
-        aliPayDetails.setCertificates(getCertificates());
-        return aliPayDetails;
     }
 
 }

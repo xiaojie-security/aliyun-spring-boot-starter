@@ -3,13 +3,17 @@ package com.aliyun.core.alipay;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayRequest;
 import com.alipay.api.AlipayResponse;
-import com.aliyun.model.AliPayDetails;
+import com.aliyun.properties.AlipayProperties;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Component;
 
+@Component
 public abstract class AbstractAlipayService {
 
-    protected abstract AliPayDetails getAliPayDetails();
-
     protected abstract com.alipay.api.AlipayClient getAlipayClient();
+
+    @Resource
+    protected AlipayProperties properties;
 
     /**
      * 执行支付宝请求。
@@ -48,6 +52,6 @@ public abstract class AbstractAlipayService {
      * @return true-启用证书模式，false-公钥模式
      */
     protected boolean useCertificateMode() {
-        return getAliPayDetails() != null && getAliPayDetails().isCertificates();
+        return properties != null && properties.isCertificates();
     }
 }

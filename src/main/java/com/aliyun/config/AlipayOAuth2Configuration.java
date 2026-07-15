@@ -4,7 +4,7 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.DefaultAlipayClient;
 import com.aliyun.core.alipay.oauth2.AliPayOAuth2Service;
 import com.aliyun.core.alipay.oauth2.impl.DefaultAliPayOAuth2Service;
-import com.aliyun.properties.AliPayProperties;
+import com.aliyun.properties.AlipayProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,13 +16,8 @@ import org.springframework.context.annotation.Bean;
  */
 @AutoConfiguration
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "aliyun.pay.oauth2", name = "enable", havingValue = "true")
+@ConditionalOnProperty(prefix = "alipay.oauth2", name = "enable", havingValue = "true")
 public class AlipayOAuth2Configuration {
-
-    public static final String FORMAT = "json";
-    public static final String CHARSET = "UTF-8";
-    public static final String SIGN_TYPE = "RSA2";
-    private final AliPayProperties aliPayProperties;
 
     /**
      * 装配支付宝 OAuth2 服务。
@@ -32,20 +27,7 @@ public class AlipayOAuth2Configuration {
      */
     @Bean
     @ConditionalOnMissingBean(AliPayOAuth2Service.class)
-    public AliPayOAuth2Service aliPayOAuth2Service() throws AlipayApiException {
-        com.alipay.api.AlipayConfig alipayConfig = new com.alipay.api.AlipayConfig();
-        alipayConfig.setServerUrl(aliPayProperties.getGateWay());
-        alipayConfig.setAppId(aliPayProperties.getAppId());
-        alipayConfig.setFormat(FORMAT);
-        alipayConfig.setPrivateKey(aliPayProperties.getPrivateKey());
-        if (aliPayProperties.isCertificates()) {
-            alipayConfig.setAppCertPath(aliPayProperties.getAppCertPath());
-            alipayConfig.setAlipayPublicCertPath(aliPayProperties.getAlipayPublicCertPath());
-            alipayConfig.setRootCertPath(aliPayProperties.getRootCertPath());
-        }
-        alipayConfig.setAlipayPublicKey(aliPayProperties.getPublicKey());
-        alipayConfig.setCharset(CHARSET);
-        alipayConfig.setSignType(SIGN_TYPE);
-        return new DefaultAliPayOAuth2Service(new DefaultAlipayClient(alipayConfig), aliPayProperties.getAliPayDetails());
+    public AliPayOAuth2Service aliPayOAuth2Service(com.alipay.api.AlipayConfig alipayConfig) throws AlipayApiException {
+        return new DefaultAliPayOAuth2Service(new DefaultAlipayClient(alipayConfig));
     }
 }

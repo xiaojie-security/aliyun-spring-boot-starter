@@ -1,12 +1,17 @@
 package com.aliyun.core.alipay.oauth2;
 
 import com.alipay.api.response.AlipayUserInfoShareResponse;
+import com.aliyun.core.alipay.oauth2.domain.AliPayOauthTokenResult;
 import com.aliyun.core.alipay.oauth2.domain.AuthorizationRequest;
-import com.aliyun.model.AliPaySystemOauthDetails;
 
 public interface AliPayOAuth2Service {
 
-
+    /**
+     * 生成支付宝授权链接。
+     *
+     * @param request 授权请求参数
+     * @return 授权链接
+     */
     String generateAuthUrl(AuthorizationRequest request);
 
     /**
@@ -23,7 +28,7 @@ public interface AliPayOAuth2Service {
      * @param authorizationCode 授权码
      * @return OAuth2 令牌信息
      */
-    AliPaySystemOauthDetails getAccessTokenByCode(String authorizationCode);
+    AliPayOauthTokenResult getAccessTokenByCode(String authorizationCode);
 
     /**
      * 通过刷新令牌换取新令牌。
@@ -31,5 +36,5 @@ public interface AliPayOAuth2Service {
      * @param refreshToken 刷新令牌
      * @return OAuth2 令牌信息
      */
-    AliPaySystemOauthDetails refreshAccessToken(String refreshToken);
+    AliPayOauthTokenResult refreshAccessToken(String refreshToken);
 }

@@ -1,53 +1,45 @@
 package com.aliyun.core.alipay.oauth2.domain;
 
+import com.aliyun.core.alipay.oauth2.enums.AlipayOauthScope;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 网站应用授权链接请求参数实体类
- * 用于构建OAuth2.0授权请求链接，支持网页应用获取用户授权
- * 
- * @author YourName
- * @version 1.0
- * @since 2026-07-15
+ * 支付宝网站/APP 授权链接请求参数。
  */
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthorizationRequest {
 
     /**
-     * 应用唯一标识（必填）
-     * 在微信开放平台提交应用审核通过后获得
+     * 应用 ID。
+     * 为空时默认取全局支付宝配置中的 appId。
      */
-    private String appid;
-    
+    private String appId;
+
     /**
-     * 回调地址（必填）
-     * 用户授权后重定向的URL，需要使用URLEncode进行编码
+     * 授权回调地址。
      */
     private String redirectUri;
 
-    
     /**
-     * 应用授权作用域（必填）
+     * 授权作用域。
      */
-    private String scope = "auth_user";
-    
+    @Builder.Default
+    private AlipayOauthScope scope = AlipayOauthScope.AUTH_USER;
+
     /**
-     * 状态参数（可选）
-     * 用于保持请求和回调的状态，授权请求后原样带回给第三方
-     * 可用于防止CSRF攻击（跨站请求伪造攻击）
-     * 建议设置为随机数加session进行校验
+     * 商户自定义状态串。
      */
     private String state;
-
 
     public AuthorizationRequest(String redirectUri, String state) {
         this.redirectUri = redirectUri;
         this.state = state;
+        this.scope = AlipayOauthScope.AUTH_USER;
     }
 }

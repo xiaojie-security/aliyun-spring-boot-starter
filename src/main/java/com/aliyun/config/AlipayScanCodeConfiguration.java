@@ -1,13 +1,8 @@
 package com.aliyun.config;
 
-import com.alipay.api.AlipayApiException;
-import com.alipay.api.DefaultAlipayClient;
 import com.alipay.v3.ApiException;
-import com.aliyun.core.pay.AliPayOAuth2Service;
-import com.aliyun.core.pay.AliPayScanCodeService;
-import com.aliyun.properties.AliPayOAuth2Properties;
-import com.aliyun.properties.AliPayScanCodeProperties;
-import com.aliyun.properties.pojo.AliPay;
+import com.aliyun.core.alipay.payment.AliPayScanCodeService;
+import com.aliyun.properties.AliPayProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,22 +17,22 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "aliyun.pay.scan-code", name = "enable", havingValue = "true")
 public class AlipayScanCodeConfiguration {
 
-    private final AliPayScanCodeProperties aliPayScanCodeProperties;
+    private final AliPayProperties aliPayProperties;
 
     @Bean
     @ConditionalOnMissingBean(AliPayScanCodeService.class)
     public AliPayScanCodeService scanCodeAliyunPayService()  throws ApiException{
         com.alipay.v3.ApiClient apiClient = com.alipay.v3.Configuration.getDefaultApiClient();
         com.alipay.v3.util.model.AlipayConfig alipayConfig = new com.alipay.v3.util.model.AlipayConfig();
-        alipayConfig.setServerUrl(aliPayScanCodeProperties.getGateWay());
-        alipayConfig.setAppId(aliPayScanCodeProperties.getAppId());
-        alipayConfig.setPrivateKey(aliPayScanCodeProperties.getPrivateKey());
-        if (aliPayScanCodeProperties.isCertificates()) {
-            alipayConfig.setAppCertPath(aliPayScanCodeProperties.getAppCertPath());
-            alipayConfig.setAlipayPublicCertPath(aliPayScanCodeProperties.getAlipayPublicCertPath());
-            alipayConfig.setRootCertPath(aliPayScanCodeProperties.getRootCertPath());
+        alipayConfig.setServerUrl(aliPayProperties.getGateWay());
+        alipayConfig.setAppId(aliPayProperties.getAppId());
+        alipayConfig.setPrivateKey(aliPayProperties.getPrivateKey());
+        if (aliPayProperties.isCertificates()) {
+            alipayConfig.setAppCertPath(aliPayProperties.getAppCertPath());
+            alipayConfig.setAlipayPublicCertPath(aliPayProperties.getAlipayPublicCertPath());
+            alipayConfig.setRootCertPath(aliPayProperties.getRootCertPath());
         }
-        alipayConfig.setAlipayPublicKey(aliPayScanCodeProperties.getPublicKey());
+        alipayConfig.setAlipayPublicKey(aliPayProperties.getPublicKey());
         apiClient.setAlipayConfig(alipayConfig);
         return new AliPayScanCodeService(apiClient);
     }

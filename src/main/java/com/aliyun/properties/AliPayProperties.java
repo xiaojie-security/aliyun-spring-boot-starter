@@ -6,18 +6,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @ConfigurationProperties(prefix = "aliyun.pay")
 @Component
-@Slf4j
-public abstract class AliPayBaseProperties {
+@Data
+public class AliPayProperties {
 
     /**
      * 应用ID
@@ -78,6 +76,19 @@ public abstract class AliPayBaseProperties {
         return Boolean.TRUE.equals(certificates);
     }
 
-    public abstract AliPayDetails getAliPayDetails();
+    public AliPayDetails getAliPayDetails() {
+        AliPayDetails aliPayDetails = new AliPayDetails();
+        aliPayDetails.setAppId(getAppId());
+        aliPayDetails.setGateWay(getGateWay());
+        aliPayDetails.setPrivateKey(getPrivateKey());
+        aliPayDetails.setPublicKey(getPublicKey());
+        aliPayDetails.setRootCertPath(getRootCertPath());
+        aliPayDetails.setAppCertPath(getAppCertPath());
+        aliPayDetails.setAlipayPublicCertPath(getAlipayPublicCertPath());
+        aliPayDetails.setSellerId(getSellerId());
+        aliPayDetails.setValidityTime(getValidityTime());
+        aliPayDetails.setCertificates(getCertificates());
+        return aliPayDetails;
+    }
 
 }

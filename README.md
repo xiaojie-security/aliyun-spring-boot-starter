@@ -13,8 +13,8 @@
 
 - 所有配置都放在 `aliyun` 根前缀下。
 - 各个服务分开配置，不再把所有信息聚合到一起。
-- 支付宝子配置支持回退到公共配置：子配置不写的字段，直接使用 `aliyun.pay` 里的值。
-- 支付宝子配置名字是 `app`、`fund`、`scan-code`、`oauth`，不是 `oauth2`。
+- 支付宝只保留一组全局配置 `aliyun.pay`，APP 支付、扫码支付、资金转账、OAuth2 共用同一套参数。
+- 支付宝功能开关仍然按 `app`、`fund`、`scan-code`、`oauth2` 分开控制。
 - OSS、IMM、SMS、PNS 如果使用 `ramRoleArn` 获取临时凭证，建议同时开启 `aliyun.sts`。
 
 ## 各服务配置
@@ -106,29 +106,36 @@ aliyun:
 
 ### 支付宝配置
 
-- 公共配置前缀：`aliyun.pay`
-- 子配置前缀：`aliyun.pay.app`、`aliyun.pay.scan-code`、`aliyun.pay.fund`、`aliyun.pay.oauth`
-- 子配置只要开启 `enable`，未配置的字段会自动回退到公共配置。
+- 全局配置前缀：`aliyun.pay`
+- 功能开关前缀：`aliyun.pay.app`、`aliyun.pay.scan-code`、`aliyun.pay.fund`、`aliyun.pay.oauth2`
 
-#### 公共配置
+#### 全局配置
 
 ```yaml
 aliyun:
   pay:
-    enable: true
-    app-id: your-common-app-id
+    app-id: your-app-id
     gate-way: https://openapi.alipay.com/gateway.do
-    private-key: your-common-private-key
-    public-key: your-common-public-key
+    private-key: your-private-key
+    public-key: your-public-key
     certificates: false
     app-cert-path: cert/appCertPublicKey.crt
     alipay-public-cert-path: cert/alipayCertPublicKey_RSA2.crt
     root-cert-path: cert/alipayRootCert.crt
-    seller-id: your-common-seller-id
+    seller-id: your-seller-id
     validity-time: 1800000
+
+    app:
+      enable: true
+    scan-code:
+      enable: true
+    fund:
+      enable: true
+    oauth2:
+      enable: true
 ```
 
-- 必填：`enable`、`gate-way`、`private-key`
+- 必填：`gate-way`、`private-key`
 - 二选一：`public-key` 或者证书模式的三个证书路径
 
 #### APP 支付
@@ -136,14 +143,8 @@ aliyun:
 ```yaml
 aliyun:
   pay:
-    enable: true
-    gate-way: https://openapi.alipay.com/gateway.do
-    private-key: your-common-private-key
-    public-key: your-common-public-key
-
     app:
       enable: true
-      app-id: your-app-specific-app-id
 ```
 
 #### 扫码支付
@@ -151,15 +152,8 @@ aliyun:
 ```yaml
 aliyun:
   pay:
-    enable: true
-    gate-way: https://openapi.alipay.com/gateway.do
-    private-key: your-common-private-key
-    public-key: your-common-public-key
-
     scan-code:
       enable: true
-      app-id: your-scan-specific-app-id
-      seller-id: your-seller-id
 ```
 
 #### 资金转账
@@ -167,14 +161,8 @@ aliyun:
 ```yaml
 aliyun:
   pay:
-    enable: true
-    gate-way: https://openapi.alipay.com/gateway.do
-    private-key: your-common-private-key
-    public-key: your-common-public-key
-
     fund:
       enable: true
-      app-id: your-fund-specific-app-id
 ```
 
 #### OAuth2 授权
@@ -182,14 +170,8 @@ aliyun:
 ```yaml
 aliyun:
   pay:
-    enable: true
-    gate-way: https://openapi.alipay.com/gateway.do
-    private-key: your-common-private-key
-    public-key: your-common-public-key
-
-    oauth:
+    oauth2:
       enable: true
-      app-id: your-oauth-specific-app-id
 ```
 
 ## 使用示例
@@ -220,7 +202,7 @@ public class OssDemoController {
 ### OAuth2
 
 ```java
-import com.aliyun.core.pay.AliPayOAuth2Service;
+import com.aliyun.core.alipay.payment.AliPayOAuth2Service;
 import com.aliyun.model.AliPaySystemOauthDetails;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import lombok.RequiredArgsConstructor;

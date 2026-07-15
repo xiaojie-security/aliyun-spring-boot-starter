@@ -2,9 +2,8 @@ package com.aliyun.config;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.DefaultAlipayClient;
-import com.aliyun.core.pay.AliPayOAuth2Service;
-import com.aliyun.model.AliPayDetails;
-import com.aliyun.properties.AliPayOAuth2Properties;
+import com.aliyun.core.alipay.payment.AliPayOAuth2Service;
+import com.aliyun.properties.AliPayProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -22,25 +21,25 @@ public class AlipayOAuth2Configuration {
     public static final String FORMAT = "json";
     public static final String CHARSET = "UTF-8";
     public static final String SIGN_TYPE = "RSA2";
-    private final AliPayOAuth2Properties aliPayOAuth2Properties;
+    private final AliPayProperties aliPayProperties;
 
     
     @Bean
     @ConditionalOnMissingBean(AliPayOAuth2Service.class)
     public AliPayOAuth2Service aliPayOAuth2Service() throws AlipayApiException {
         com.alipay.api.AlipayConfig alipayConfig = new com.alipay.api.AlipayConfig();
-        alipayConfig.setServerUrl(aliPayOAuth2Properties.getGateWay());
-        alipayConfig.setAppId(aliPayOAuth2Properties.getAppId());
+        alipayConfig.setServerUrl(aliPayProperties.getGateWay());
+        alipayConfig.setAppId(aliPayProperties.getAppId());
         alipayConfig.setFormat(FORMAT);
-        alipayConfig.setPrivateKey(aliPayOAuth2Properties.getPrivateKey());
-        if (aliPayOAuth2Properties.isCertificates()) {
-            alipayConfig.setAppCertPath(aliPayOAuth2Properties.getAppCertPath());
-            alipayConfig.setAlipayPublicCertPath(aliPayOAuth2Properties.getAlipayPublicCertPath());
-            alipayConfig.setRootCertPath(aliPayOAuth2Properties.getRootCertPath());
+        alipayConfig.setPrivateKey(aliPayProperties.getPrivateKey());
+        if (aliPayProperties.isCertificates()) {
+            alipayConfig.setAppCertPath(aliPayProperties.getAppCertPath());
+            alipayConfig.setAlipayPublicCertPath(aliPayProperties.getAlipayPublicCertPath());
+            alipayConfig.setRootCertPath(aliPayProperties.getRootCertPath());
         }
-        alipayConfig.setAlipayPublicKey(aliPayOAuth2Properties.getPublicKey());
+        alipayConfig.setAlipayPublicKey(aliPayProperties.getPublicKey());
         alipayConfig.setCharset(CHARSET);
         alipayConfig.setSignType(SIGN_TYPE);
-        return new AliPayOAuth2Service(new DefaultAlipayClient(alipayConfig), aliPayOAuth2Properties.getAliPayDetails());
+        return new AliPayOAuth2Service(new DefaultAlipayClient(alipayConfig), aliPayProperties.getAliPayDetails());
     }
 }

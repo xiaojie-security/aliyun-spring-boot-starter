@@ -1,29 +1,75 @@
 package com.aliyun.core.alipay.transfer;
 
-import com.alipay.api.response.AlipayFundTransCommonQueryResponse;
-import com.alipay.api.response.AlipayFundTransUniTransferResponse;
+import com.aliyun.core.alipay.transfer.domain.AliPayBillDownloadUrlQueryParam;
+import com.aliyun.core.alipay.transfer.domain.AliPayBillDownloadUrlResult;
+import com.aliyun.core.alipay.transfer.domain.AliPayEreceiptApplyParam;
+import com.aliyun.core.alipay.transfer.domain.AliPayEreceiptApplyResult;
+import com.aliyun.core.alipay.transfer.domain.AliPayEreceiptQueryParam;
+import com.aliyun.core.alipay.transfer.domain.AliPayEreceiptQueryResult;
+import com.aliyun.core.alipay.transfer.domain.AliPayFundAccountQueryParam;
+import com.aliyun.core.alipay.transfer.domain.AliPayFundAccountQueryResult;
+import com.aliyun.core.alipay.transfer.domain.AliPayFundQuotaQueryParam;
+import com.aliyun.core.alipay.transfer.domain.AliPayFundQuotaQueryResult;
+import com.aliyun.core.alipay.transfer.domain.AliPayTransferParam;
+import com.aliyun.core.alipay.transfer.domain.AliPayTransferQueryParam;
+import com.aliyun.core.alipay.transfer.domain.AliPayTransferQueryResult;
+import com.aliyun.core.alipay.transfer.domain.AliPayTransferResult;
 
 public interface AlipayTransferService {
 
     /**
-     * 发起单笔转账。
+     * 支付宝资金账户资产查询。
      *
-     * @param outBizNo 商户转账单号
-     * @param transAmount 转账金额
-     * @param orderTitle 转账标题
-     * @param openId 收款方 openId
-     * @param remark 转账备注
-     * @return 转账结果
+     * @param queryParam 查询参数
+     * @return 查询结果
      */
-    AlipayFundTransUniTransferResponse transfer(String outBizNo, String transAmount, String orderTitle, String openId, String remark);
+    AliPayFundAccountQueryResult accountQuery(AliPayFundAccountQueryParam queryParam);
 
     /**
-     * 查询转账结果。
+     * 查询转账额度。
      *
-     * @param outBizNo 商户转账单号
-     * @param orderId 支付宝转账单据号
-     * @param payFundOrderId 支付宝支付资金流水号
-     * @return 转账查询结果
+     * @param queryParam 查询参数
+     * @return 查询结果
      */
-    AlipayFundTransCommonQueryResponse query(String outBizNo, String orderId, String payFundOrderId);
+    AliPayFundQuotaQueryResult quotaQuery(AliPayFundQuotaQueryParam queryParam);
+
+    /**
+     * 申请电子回单。
+     *
+     * @param applyParam 申请参数
+     * @return 申请结果
+     */
+    AliPayEreceiptApplyResult applyEreceipt(AliPayEreceiptApplyParam applyParam);
+
+    /**
+     * 查询电子回单状态。
+     *
+     * @param queryParam 查询参数
+     * @return 查询结果
+     */
+    AliPayEreceiptQueryResult queryEreceipt(AliPayEreceiptQueryParam queryParam);
+
+    /**
+     * 发起单笔转账。
+     *
+     * @param transferParam 转账参数
+     * @return 转账结果
+     */
+    AliPayTransferResult transfer(AliPayTransferParam transferParam);
+
+    /**
+     * 查询转账单据。
+     *
+     * @param queryParam 查询参数
+     * @return 查询结果
+     */
+    AliPayTransferQueryResult query(AliPayTransferQueryParam queryParam);
+
+    /**
+     * 查询账单下载地址。
+     *
+     * @param queryParam 查询参数
+     * @return 查询结果
+     */
+    AliPayBillDownloadUrlResult queryBillDownloadUrl(AliPayBillDownloadUrlQueryParam queryParam);
 }

@@ -14,7 +14,7 @@ import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
-import com.aliyun.core.exception.AliyunException;
+import com.aliyun.exception.AliyunException;
 import com.aliyun.exception.AliPayException;
 import com.aliyun.model.AliPayDetails;
 import com.aliyun.model.AliPayRefundParam;

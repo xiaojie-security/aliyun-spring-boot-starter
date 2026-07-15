@@ -6,7 +6,7 @@ import com.alipay.v3.api.AlipayTradeApi;
 import com.alipay.v3.api.AlipayTradeFastpayRefundApi;
 import com.alipay.v3.model.*;
 import com.alipay.v3.util.GenericExecuteApi;
-import com.aliyun.core.exception.AliyunException;
+import com.aliyun.exception.AliyunException;
 import com.aliyun.model.AliPayDetails;
 import com.aliyun.model.AliPayRefundParam;
 import com.aliyun.model.AliPayTradeParam;

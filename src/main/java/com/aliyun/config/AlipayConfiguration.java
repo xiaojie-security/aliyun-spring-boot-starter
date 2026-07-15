@@ -3,7 +3,6 @@ package com.aliyun.config;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.v3.ApiException;
-import com.alipay.v3.util.model.AlipayConfig;
 import com.aliyun.core.pay.*;
 import com.aliyun.model.AliPayDetails;
 import com.aliyun.properties.AliyunProperties;

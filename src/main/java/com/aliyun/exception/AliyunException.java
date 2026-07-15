@@ -1,4 +1,4 @@
-package com.aliyun.core.exception;
+package com.aliyun.exception;
 
 /**
  * 阿里云通用运行时异常。

@@ -12,7 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AliPayTransferSceneReportInfo {
 
+    /**
+     * 场景信息内容。
+     */
     private String infoContent;
 
+    /**
+     * 场景信息类型。
+     */
     private String infoType;
 }

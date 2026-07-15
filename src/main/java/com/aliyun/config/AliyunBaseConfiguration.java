@@ -1,9 +1,7 @@
 package com.aliyun.config;
 
 import com.aliyun.credentials.Client;
-import com.aliyun.model.AliyunCredential;
-import com.aliyun.properties.pojo.AliyunSts;
-import org.checkerframework.checker.units.qual.A;
+import com.aliyun.config.domain.AliyunCredential;
 
 import java.util.UUID;
 

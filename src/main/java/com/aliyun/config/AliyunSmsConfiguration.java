@@ -1,9 +1,9 @@
 package com.aliyun.config;
 
 import com.aliyun.core.sms.AliyunSmsService;
-import com.aliyun.model.AliyunCredential;
-import com.aliyun.properties.AliyunProperties;
-import com.aliyun.properties.pojo.AliyunSms;
+import com.aliyun.config.domain.AliyunCredential;
+import com.aliyun.properties.AliyunSmsProperties;
+import com.aliyun.properties.AliyunStsProperties;
 import com.aliyun.teaopenapi.models.Config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
@@ -18,17 +18,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "aliyun.sms", name = "enable", havingValue = "true")
-public class AliyunSmsConfiguration extends AliyunBaseConfiguration implements InitializingBean {
+public class AliyunSmsConfiguration extends AliyunBaseConfiguration {
 
-    private final AliyunProperties aliyunProperties;
-    private AliyunSms sms;
-    private AliyunCredential credential;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        sms = aliyunProperties.getSms();
-        credential = aliyunProperties.createStsCredential(sms.getRamRoleArn());
-    }
+    private final AliyunSmsProperties sms;
+    private final AliyunCredential credential;
 
     @Bean("aliyunSmsClient")
     @ConditionalOnMissingBean(com.aliyun.dysmsapi20170525.Client.class)

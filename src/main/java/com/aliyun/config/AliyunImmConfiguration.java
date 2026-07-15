@@ -2,9 +2,9 @@ package com.aliyun.config;
 
 import com.aliyun.core.imm.AliyunImmService;
 import com.aliyun.core.imm.impl.DefaultAliyunImmService;
-import com.aliyun.model.AliyunCredential;
-import com.aliyun.properties.AliyunProperties;
-import com.aliyun.properties.pojo.AliyunImm;
+import com.aliyun.config.domain.AliyunCredential;
+import com.aliyun.properties.AliyunImmProperties;
+import com.aliyun.properties.AliyunStsProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -18,17 +18,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "aliyun.imm", name = "enable", havingValue = "true")
-public class AliyunImmConfiguration extends AliyunBaseConfiguration implements InitializingBean {
+public class AliyunImmConfiguration extends AliyunBaseConfiguration {
 
-    private final AliyunProperties aliyunProperties;
-    private AliyunImm imm;
-    private AliyunCredential credential;
+    private final AliyunImmProperties imm;
+    private final AliyunCredential credential;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        imm = aliyunProperties.getImm();
-        credential = aliyunProperties.createStsCredential(imm.getRamRoleArn());
-    }
 
     @Bean
     @ConditionalOnMissingBean(com.aliyun.imm20200930.Client.class)

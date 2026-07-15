@@ -1,8 +1,0 @@
-com.aliyun.config.AliyunConfiguration
-com.aliyun.config.AliyunStsConfiguration
-com.aliyun.config.AliyunImmConfiguration
-com.aliyun.config.AliyunOssConfiguration
-com.aliyun.config.AlipayConfiguration
-com.aliyun.config.AliyunPnsConfiguration
-com.aliyun.config.AliyunSmsConfiguration
-com.aliyun.config.AliyunStsConfiguration

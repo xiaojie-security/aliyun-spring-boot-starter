@@ -11,7 +11,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.common.comm.io.BoundedInputStream;
 import com.aliyun.oss.common.utils.BinaryUtil;
 import com.aliyun.oss.model.GeneratePresignedUrlRequest;
-import com.aliyun.properties.pojo.AliyunOss;
+import com.aliyun.properties.AliyunOssProperties;
 import com.aliyun.sdk.service.oss2.OSSClient;
 import com.aliyun.sdk.service.oss2.models.*;
 import com.aliyun.sdk.service.oss2.transport.BinaryData;
@@ -43,7 +43,7 @@ public class DefaultAliyunOssService extends AbstractAliyunOssService {
     public static final long FILE_SIZE_MB = 500L;
     private final OSSClient ossV2Client;
     private final OSS ossClient;
-    private final AliyunOss aliyunOss;
+    private final AliyunOssProperties aliyunOssProperties;
 
 
 
@@ -111,9 +111,9 @@ public class DefaultAliyunOssService extends AbstractAliyunOssService {
             mediaUploadDetail.setOriginFileName(originalFilename);
             mediaUploadDetail.setFinalFileName(fileName);
             mediaUploadDetail.setContentType(contentType);
-            mediaUploadDetail.setEndpoint(aliyunOss.getEndpoint());
-            mediaUploadDetail.setRegion(aliyunOss.getRegion());
-            mediaUploadDetail.setUri(aliyunOss.getUri());
+            mediaUploadDetail.setEndpoint(aliyunOssProperties.getEndpoint());
+            mediaUploadDetail.setRegion(aliyunOssProperties.getRegion());
+            mediaUploadDetail.setUri(aliyunOssProperties.getUri());
             return mediaUploadDetail;
         } catch (Exception e) {
             log.error("AliyunOssMediaService upload 文件上传失败 objectName: {} ", objectName);
@@ -211,9 +211,9 @@ public class DefaultAliyunOssService extends AbstractAliyunOssService {
         mediaUploadDetail.setOriginFileName(originalFilename);
         mediaUploadDetail.setFinalFileName(fileName);
         mediaUploadDetail.setContentType(contentType);
-        mediaUploadDetail.setEndpoint(aliyunOss.getEndpoint());
-        mediaUploadDetail.setRegion(aliyunOss.getRegion());
-        mediaUploadDetail.setUri(aliyunOss.getUri());
+        mediaUploadDetail.setEndpoint(aliyunOssProperties.getEndpoint());
+        mediaUploadDetail.setRegion(aliyunOssProperties.getRegion());
+        mediaUploadDetail.setUri(aliyunOssProperties.getUri());
         return mediaUploadDetail;
     }
 
@@ -338,12 +338,12 @@ public class DefaultAliyunOssService extends AbstractAliyunOssService {
      */
     public String generatePresignedUrl(String bucket, String objectName) {
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucket, objectName);
-        request.setExpiration(new Date(System.currentTimeMillis() + 1000L * aliyunOss.getExpire()));
+        request.setExpiration(new Date(System.currentTimeMillis() + 1000L * aliyunOssProperties.getExpire()));
         request.setMethod(com.aliyun.oss.HttpMethod.GET);
         // 全新v2版本未提供生成临时签名的方法 使用老版本兼容先
         URL url = ossClient.generatePresignedUrl(request);
-        return StrUtil.isEmpty(aliyunOss.getUri()) ? url.toString() : UrlBuilder
-                .of(aliyunOss.getUri())
+        return StrUtil.isEmpty(aliyunOssProperties.getUri()) ? url.toString() : UrlBuilder
+                .of(aliyunOssProperties.getUri())
                 .addPath(url.getPath())
                 .toString() + "?" + url.getQuery();
     }
@@ -366,13 +366,13 @@ public class DefaultAliyunOssService extends AbstractAliyunOssService {
             throw AliyunMediaException.FILE_NAME_ERROR;
         }
         GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucket, objectName);
-        request.setExpiration(new Date(System.currentTimeMillis() + 1000L * aliyunOss.getExpire()));
+        request.setExpiration(new Date(System.currentTimeMillis() + 1000L * aliyunOssProperties.getExpire()));
         request.setMethod(com.aliyun.oss.HttpMethod.GET);
         // 默认输出 jpg，并开启 fast 模式，满足大多数视频预览场景
         request.setProcess(buildVideoSnapshotProcess(timeInMillis));
         URL url = ossClient.generatePresignedUrl(request);
-        return StrUtil.isEmpty(aliyunOss.getUri()) ? url.toString() : UrlBuilder
-                .of(aliyunOss.getUri())
+        return StrUtil.isEmpty(aliyunOssProperties.getUri()) ? url.toString() : UrlBuilder
+                .of(aliyunOssProperties.getUri())
                 .addPath(url.getPath())
                 .toString() + "?" + url.getQuery();
     }
@@ -386,11 +386,11 @@ public class DefaultAliyunOssService extends AbstractAliyunOssService {
             throw AliyunMediaException.SYSTEM_ERROR;
         }
         // 得到STS认证信息
-        String region = aliyunOss.getRegion();
-        String endpoint = aliyunOss.getEndpoint();
+        String region = aliyunOssProperties.getRegion();
+        String endpoint = aliyunOssProperties.getEndpoint();
         String directory = getDirectory();
         String bucket = getBucket();
-        String callback = aliyunOss.getCallback();
+        String callback = aliyunOssProperties.getCallback();
 
         //获取x-oss-credential里的date，当前日期，格式为yyyyMMdd
         ZonedDateTime today = ZonedDateTime.now().withZoneSameInstant(java.time.ZoneOffset.UTC);
@@ -507,15 +507,15 @@ public class DefaultAliyunOssService extends AbstractAliyunOssService {
      */
     public String getBucket(String contentType) {
         if (StrUtil.isEmpty(contentType)) {
-            return aliyunOss.getDefaultBucket();
+            return aliyunOssProperties.getDefaultBucket();
         }
         if (!contentType.contains("/")) {
-            return aliyunOss.getDefaultBucket();
+            return aliyunOssProperties.getDefaultBucket();
         }
         // 获取文件类型的前缀
         String prefix = contentType.split("/")[0];
-        Map<String, String> bucketMap = aliyunOss.getBuckets();
-        return bucketMap.containsKey(prefix) ? bucketMap.get(prefix) : aliyunOss.getDefaultBucket();
+        Map<String, String> bucketMap = aliyunOssProperties.getBuckets();
+        return bucketMap.containsKey(prefix) ? bucketMap.get(prefix) : aliyunOssProperties.getDefaultBucket();
     }
 
     /**

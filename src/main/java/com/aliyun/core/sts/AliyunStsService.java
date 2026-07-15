@@ -1,7 +1,7 @@
 package com.aliyun.core.sts;
 
 import com.aliyun.model.AliyunStsSecurityCredential;
-import com.aliyun.properties.pojo.AliyunSts;
+import com.aliyun.properties.AliyunStsProperties;
 import com.aliyun.sts20150401.models.AssumeRoleResponse;
 import com.aliyun.sts20150401.models.AssumeRoleResponseBody;
 import com.aliyun.tea.TeaException;
@@ -14,8 +14,6 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class AliyunStsService {
-
-    private final AliyunSts sts;
     private final com.aliyun.sts20150401.Client client;
 
 

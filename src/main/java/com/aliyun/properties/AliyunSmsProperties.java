@@ -1,10 +1,12 @@
-package com.aliyun.properties.pojo;
+package com.aliyun.properties;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.StrUtil;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,7 +19,10 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class AliyunSms extends AliyunBaseProperties {
+@ConfigurationProperties(prefix = "aliyun.sms")
+@Component
+@Slf4j
+public class AliyunSmsProperties extends AliyunBaseProperties implements InitializingBean {
 
     /**
      * 短信服务接入端点
@@ -54,6 +59,13 @@ public class AliyunSms extends AliyunBaseProperties {
             return defaultSignName;
         }
         return signNames.getOrDefault(signKey, defaultSignName);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (isEnable()) {
+            log.debug("AliyunSmsProperties.afterPropertiesSet SMS短信服务");
+        }
     }
 
 }

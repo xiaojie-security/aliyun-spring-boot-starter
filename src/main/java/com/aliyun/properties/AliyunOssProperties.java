@@ -1,6 +1,10 @@
-package com.aliyun.properties.pojo;
+package com.aliyun.properties;
 
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -14,7 +18,10 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class AliyunOss extends AliyunBaseProperties {
+@ConfigurationProperties(prefix = "aliyun.oss")
+@Component
+@Slf4j
+public class AliyunOssProperties extends AliyunBaseProperties implements InitializingBean {
 
     /**
      * OSS 服务接入点地址
@@ -62,5 +69,13 @@ public class AliyunOss extends AliyunBaseProperties {
      * 设置上传回调URL（即回调服务器地址），必须为公网地址。用于处理应用服务器与OSS之间的通信，OSS会在文件上传完成后，把文件上传信息通过此回调URL发送给应用服务器。
      */
     private String callback;
+
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (isEnable()) {
+            log.debug("AliyunOssProperties.afterPropertiesSet OSS对象存储");
+        }
+    }
 }
 

@@ -1,17 +1,14 @@
 package com.aliyun.core.imm.impl;
 
-import cn.hutool.core.util.StrUtil;
 import com.aliyun.core.imm.AliyunImmService;
 import com.aliyun.exception.AliyunMediaException;
 import com.aliyun.imm20200930.models.CreateMediaConvertTaskResponseBody;
 import com.aliyun.model.AliyunTransCodeResult;
-import com.aliyun.properties.pojo.AliyunImm;
-import com.aliyun.properties.AliyunProperties;
+import com.aliyun.properties.AliyunImmProperties;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Collections;
 
@@ -21,7 +18,7 @@ import java.util.Collections;
 @Slf4j
 @RequiredArgsConstructor
 public class DefaultAliyunImmService implements AliyunImmService {
-    private final AliyunImm imm;
+    private final AliyunImmProperties imm;
     private static final String VIDEO = "_transcoding";
     private final com.aliyun.imm20200930.Client client;
 

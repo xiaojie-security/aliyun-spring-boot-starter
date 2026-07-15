@@ -1,4 +1,4 @@
-package com.aliyun.enums;
+package com.aliyun.core.alipay.payment.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
-package com.aliyun.model;
+package com.aliyun.core.alipay.payment.domain;
 
-import com.aliyun.enums.AlipayPaymentType;
+import com.aliyun.core.alipay.payment.enums.AlipayPaymentType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

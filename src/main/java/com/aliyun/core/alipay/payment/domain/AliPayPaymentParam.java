@@ -1,4 +1,4 @@
-package com.aliyun.model;
+package com.aliyun.core.alipay.payment.domain;
 
 import com.alipay.api.domain.ExtUserInfo;
 import com.alipay.api.domain.ExtendParams;

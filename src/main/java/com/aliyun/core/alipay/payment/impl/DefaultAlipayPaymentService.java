@@ -4,23 +4,45 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayResponse;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
+import com.alipay.api.domain.AlipayTradeCloseModel;
+import com.alipay.api.domain.AlipayTradeFastpayRefundQueryModel;
 import com.alipay.api.domain.AlipayTradePagePayModel;
 import com.alipay.api.domain.AlipayTradePrecreateModel;
+import com.alipay.api.domain.AlipayTradeQueryModel;
+import com.alipay.api.domain.AlipayTradeRefundModel;
 import com.alipay.api.domain.AlipayTradeWapPayModel;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
+import com.alipay.api.request.AlipayTradeCloseRequest;
+import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.request.AlipayTradePrecreateRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
+import com.alipay.api.response.AlipayTradeCloseResponse;
+import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
 import com.alipay.api.response.AlipayTradePagePayResponse;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.aliyun.core.alipay.AbstractAlipayService;
 import com.aliyun.core.alipay.payment.AlipayPaymentService;
-import com.aliyun.enums.AlipayPaymentType;
+import com.aliyun.core.alipay.payment.domain.AliPayRefundParam;
+import com.aliyun.core.alipay.payment.domain.AliPayRefundQueryParam;
+import com.aliyun.core.alipay.payment.domain.AliPayRefundQueryResult;
+import com.aliyun.core.alipay.payment.domain.AliPayRefundResult;
+import com.aliyun.core.alipay.payment.enums.AlipayPaymentType;
+import com.aliyun.core.alipay.payment.enums.AlipayRefundStatus;
+import com.aliyun.core.alipay.payment.enums.AlipayTradeStatus;
+import com.aliyun.core.alipay.payment.domain.AliPayPaymentParam;
+import com.aliyun.core.alipay.payment.domain.AliPayPaymentResult;
+import com.aliyun.core.alipay.payment.domain.AliPayTradeCloseParam;
+import com.aliyun.core.alipay.payment.domain.AliPayTradeCloseResult;
+import com.aliyun.core.alipay.payment.domain.AliPayTradeQueryParam;
+import com.aliyun.core.alipay.payment.domain.AliPayTradeQueryResult;
 import com.aliyun.exception.AliPayException;
-import com.aliyun.model.AliPayPaymentParam;
-import com.aliyun.model.AliPayPaymentResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -280,6 +302,151 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
         }
     }
 
+    /**
+     * 关闭交易。
+     *
+     * @param closeParam 关闭参数
+     * @return 统一支付结果
+     */
+    @Override
+    public AliPayTradeCloseResult close(AliPayTradeCloseParam closeParam) {
+        validateTradeIdentity(closeParam == null ? null : closeParam.getOutTradeNo(),
+                closeParam == null ? null : closeParam.getTradeNo());
+
+        AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
+        AlipayTradeCloseModel model = new AlipayTradeCloseModel();
+
+        model.setOutTradeNo(closeParam.getOutTradeNo());
+        model.setTradeNo(closeParam.getTradeNo());
+        model.setOperatorId(closeParam.getOperatorId());
+        request.setBizModel(model);
+
+        try {
+            AlipayTradeCloseResponse response = execute(request);
+            return AliPayTradeCloseResult.builder()
+                    .success(response.isSuccess())
+                    .apiMethod(request.getApiMethodName())
+                    .code(response.getCode())
+                    .msg(response.getMsg())
+                    .subCode(response.getSubCode())
+                    .subMsg(response.getSubMsg())
+                    .outTradeNo(response.getOutTradeNo())
+                    .tradeNo(response.getTradeNo())
+                    .build();
+        } catch (AlipayApiException e) {
+            log.error("DefaultAlipayPaymentService.close 支付宝关闭交易失败, outTradeNo={}, tradeNo={}, errCode={}, errMsg={}",
+                    closeParam.getOutTradeNo(), closeParam.getTradeNo(), e.getErrCode(), e.getErrMsg(), e);
+            throw new AliPayException("关闭订单失败");
+        }
+    }
+
+    /**
+     * 交易退款。
+     *
+     * @param refundParam 退款参数
+     * @return 统一支付结果
+     */
+    @Override
+    public AliPayRefundResult refund(AliPayRefundParam refundParam) {
+        validateRefundParam(refundParam);
+
+        AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
+        AlipayTradeRefundModel model = new AlipayTradeRefundModel();
+
+        model.setOutTradeNo(refundParam.getOutTradeNo());
+        model.setTradeNo(refundParam.getTradeNo());
+        model.setRefundAmount(formatAmount(refundParam.getRefundAmount()));
+        model.setRefundReason(refundParam.getRefundReason());
+        model.setOutRequestNo(refundParam.getOutRequestNo());
+        model.setOperatorId(refundParam.getOperatorId());
+        model.setOrgPid(refundParam.getOrgPid());
+        model.setStoreId(refundParam.getStoreId());
+        model.setTerminalId(refundParam.getTerminalId());
+        model.setQueryOptions(toList(refundParam.getQueryOptions()));
+        model.setGoodsDetail(toList(refundParam.getGoodsDetail()));
+        model.setRefundGoodsDetail(toList(refundParam.getRefundGoodsDetail()));
+        model.setRefundRoyaltyParameters(toList(refundParam.getRefundRoyaltyParameters()));
+        model.setRefundAdvanceAccount(refundParam.getRefundAdvanceAccount());
+        model.setRefundAdvanceAccountType(refundParam.getRefundAdvanceAccountType());
+        model.setRefundTransOut(refundParam.getRefundTransOut());
+        model.setRefundTransOutType(refundParam.getRefundTransOutType());
+        model.setRelatedSettleConfirmNo(refundParam.getRelatedSettleConfirmNo());
+        model.setRefundCurrency(refundParam.getRefundCurrency());
+        request.setBizModel(model);
+
+        try {
+            AlipayTradeRefundResponse response = execute(request);
+            return buildRefundResult(response, refundParam, request.getApiMethodName());
+        } catch (AlipayApiException e) {
+            log.error("DefaultAlipayPaymentService.refund 支付宝交易退款失败, outTradeNo={}, tradeNo={}, outRequestNo={}, errCode={}, errMsg={}",
+                    refundParam.getOutTradeNo(), refundParam.getTradeNo(), refundParam.getOutRequestNo(),
+                    e.getErrCode(), e.getErrMsg(), e);
+            throw AliPayException.REFUND_ERROR;
+        }
+    }
+
+    /**
+     * 退款查询。
+     *
+     * @param refundQueryParam 退款查询参数
+     * @return 统一支付结果
+     */
+    @Override
+    public AliPayRefundQueryResult queryRefund(AliPayRefundQueryParam refundQueryParam) {
+        validateTradeIdentity(refundQueryParam == null ? null : refundQueryParam.getOutTradeNo(),
+                refundQueryParam == null ? null : refundQueryParam.getTradeNo());
+
+        AlipayTradeFastpayRefundQueryRequest request = new AlipayTradeFastpayRefundQueryRequest();
+        AlipayTradeFastpayRefundQueryModel model = new AlipayTradeFastpayRefundQueryModel();
+
+        model.setOutTradeNo(refundQueryParam.getOutTradeNo());
+        model.setTradeNo(refundQueryParam.getTradeNo());
+        model.setOutRequestNo(refundQueryParam.getOutRequestNo());
+        model.setOrgPid(refundQueryParam.getOrgPid());
+        model.setQueryOptions(toList(refundQueryParam.getQueryOptions()));
+        request.setBizModel(model);
+
+        try {
+            AlipayTradeFastpayRefundQueryResponse response = execute(request);
+            return buildRefundQueryResult(response, request.getApiMethodName());
+        } catch (AlipayApiException e) {
+            log.error("DefaultAlipayPaymentService.queryRefund 支付宝退款查询失败, outTradeNo={}, tradeNo={}, outRequestNo={}, errCode={}, errMsg={}",
+                    refundQueryParam.getOutTradeNo(), refundQueryParam.getTradeNo(), refundQueryParam.getOutRequestNo(),
+                    e.getErrCode(), e.getErrMsg(), e);
+            throw AliPayException.QUERY_REFUND_ERROR;
+        }
+    }
+
+    /**
+     * 交易查询。
+     *
+     * @param queryParam 交易查询参数
+     * @return 统一支付结果
+     */
+    @Override
+    public AliPayTradeQueryResult query(AliPayTradeQueryParam queryParam) {
+        validateTradeIdentity(queryParam == null ? null : queryParam.getOutTradeNo(),
+                queryParam == null ? null : queryParam.getTradeNo());
+
+        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        AlipayTradeQueryModel model = new AlipayTradeQueryModel();
+
+        model.setOutTradeNo(queryParam.getOutTradeNo());
+        model.setTradeNo(queryParam.getTradeNo());
+        model.setOrgPid(queryParam.getOrgPid());
+        model.setQueryOptions(toList(queryParam.getQueryOptions()));
+        request.setBizModel(model);
+
+        try {
+            AlipayTradeQueryResponse response = execute(request);
+            return buildTradeQueryResult(response, request.getApiMethodName());
+        } catch (AlipayApiException e) {
+            log.error("DefaultAlipayPaymentService.query 支付宝交易查询失败, outTradeNo={}, tradeNo={}, errCode={}, errMsg={}",
+                    queryParam.getOutTradeNo(), queryParam.getTradeNo(), e.getErrCode(), e.getErrMsg(), e);
+            throw AliPayException.QUERY_ERROR;
+        }
+    }
+
     private AliPayPaymentResult buildSdkOrPageResult(AlipayResponse response, AliPayPaymentParam paymentParam,
                                                      AlipayPaymentType paymentType) {
         return AliPayPaymentResult.builder()
@@ -297,6 +464,72 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
                 .build();
     }
 
+    private AliPayTradeQueryResult buildTradeQueryResult(AlipayTradeQueryResponse response, String apiMethod) {
+        return AliPayTradeQueryResult.builder()
+                .success(response.isSuccess())
+                .apiMethod(apiMethod)
+                .code(response.getCode())
+                .msg(response.getMsg())
+                .subCode(response.getSubCode())
+                .subMsg(response.getSubMsg())
+                .outTradeNo(response.getOutTradeNo())
+                .tradeNo(response.getTradeNo())
+                .tradeStatus(AlipayTradeStatus.fromStatus(response.getTradeStatus()))
+                .tradeStatusCode(response.getTradeStatus())
+                .buyerLogonId(response.getBuyerLogonId())
+                .buyerUserId(response.getBuyerUserId())
+                .buyerPayAmount(response.getBuyerPayAmount())
+                .receiptAmount(response.getReceiptAmount())
+                .invoiceAmount(response.getInvoiceAmount())
+                .sendPayDate(response.getSendPayDate())
+                .totalAmount(response.getTotalAmount())
+                .build();
+    }
+
+    private AliPayRefundResult buildRefundResult(AlipayTradeRefundResponse response, AliPayRefundParam refundParam,
+                                                 String apiMethod) {
+        return AliPayRefundResult.builder()
+                .success(response.isSuccess())
+                .apiMethod(apiMethod)
+                .code(response.getCode())
+                .msg(response.getMsg())
+                .subCode(response.getSubCode())
+                .subMsg(response.getSubMsg())
+                .outTradeNo(response.getOutTradeNo())
+                .tradeNo(response.getTradeNo())
+                .outRequestNo(refundParam.getOutRequestNo())
+                .buyerLogonId(response.getBuyerLogonId())
+                .buyerUserId(response.getBuyerUserId())
+                .refundFee(response.getRefundFee())
+                .refundAmount(firstNonBlank(response.getRefundFee(), formatNullableAmount(refundParam.getRefundAmount())))
+                .refundReason(refundParam.getRefundReason())
+                .fundChange(response.getFundChange())
+                .gmtRefundPay(response.getGmtRefundPay())
+                .build();
+    }
+
+    private AliPayRefundQueryResult buildRefundQueryResult(AlipayTradeFastpayRefundQueryResponse response,
+                                                           String apiMethod) {
+        return AliPayRefundQueryResult.builder()
+                .success(response.isSuccess())
+                .apiMethod(apiMethod)
+                .code(response.getCode())
+                .msg(response.getMsg())
+                .subCode(response.getSubCode())
+                .subMsg(response.getSubMsg())
+                .outTradeNo(response.getOutTradeNo())
+                .tradeNo(response.getTradeNo())
+                .outRequestNo(response.getOutRequestNo())
+                .refundStatus(AlipayRefundStatus.fromStatus(response.getRefundStatus()))
+                .refundStatusCode(response.getRefundStatus())
+                .refundAmount(response.getRefundAmount())
+                .sendBackFee(response.getSendBackFee())
+                .refundReason(response.getRefundReason())
+                .gmtRefundPay(response.getGmtRefundPay())
+                .totalAmount(response.getTotalAmount())
+                .build();
+    }
+
     private void validatePaymentParam(AliPayPaymentParam paymentParam) {
         if (paymentParam == null) {
             throw new IllegalArgumentException("支付参数不能为空");
@@ -309,6 +542,22 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
         }
         if (!StringUtils.hasText(paymentParam.getSubject())) {
             throw new IllegalArgumentException("订单标题不能为空");
+        }
+    }
+
+    private void validateRefundParam(AliPayRefundParam refundParam) {
+        if (refundParam == null) {
+            throw new IllegalArgumentException("退款参数不能为空");
+        }
+        validateTradeIdentity(refundParam.getOutTradeNo(), refundParam.getTradeNo());
+        if (refundParam.getRefundAmount() == null || refundParam.getRefundAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("退款金额必须大于0");
+        }
+    }
+
+    private void validateTradeIdentity(String outTradeNo, String tradeNo) {
+        if (!StringUtils.hasText(outTradeNo) && !StringUtils.hasText(tradeNo)) {
+            throw new IllegalArgumentException("商户订单号和支付宝交易号不能同时为空");
         }
     }
 
@@ -344,6 +593,10 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
 
     private String formatNullableAmount(BigDecimal amount) {
         return amount == null ? null : formatAmount(amount);
+    }
+
+    private String firstNonBlank(String first, String second) {
+        return StringUtils.hasText(first) ? first : second;
     }
 
     private <T> List<T> toList(T[] array) {

@@ -8,30 +8,24 @@ import com.alipay.api.response.AlipaySystemOauthTokenResponse;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import com.aliyun.core.alipay.AbstractAlipayService;
 import com.aliyun.core.alipay.oauth2.AliPayOAuth2Service;
+import com.aliyun.core.alipay.oauth2.domain.AuthorizationRequest;
 import com.aliyun.exception.AliPayException;
-import com.aliyun.model.AliPayDetails;
 import com.aliyun.model.AliPaySystemOauthDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RequiredArgsConstructor
 public class DefaultAliPayOAuth2Service extends AbstractAlipayService implements AliPayOAuth2Service {
     private static final String AUTHORIZATION_CODE = "authorization_code";
     private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String AUTH_URL = "https://openauth.alipay.com/oauth2/publicAppAuthorize.htm";
 
     private final AlipayClient client;
-    private final AliPayDetails details;
-
-    /**
-     * 获取当前服务使用的支付宝配置。
-     *
-     * @return 支付宝配置
-     */
-    @Override
-    protected AliPayDetails getAliPayDetails() {
-        return details;
-    }
 
     /**
      * 获取当前服务使用的支付宝客户端。
@@ -41,6 +35,37 @@ public class DefaultAliPayOAuth2Service extends AbstractAlipayService implements
     @Override
     protected AlipayClient getAlipayClient() {
         return client;
+    }
+
+    /**
+     * 生成支付宝授权地址。
+     *
+     * @param request 授权请求参数
+     * @return 授权地址
+     */
+    @Override
+    public String generateAuthUrl(AuthorizationRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("授权请求参数不能为空");
+        }
+        if (!StringUtils.hasText(request.getRedirectUri())) {
+            throw new IllegalArgumentException("redirectUri 不能为空");
+        }
+        String appId = StringUtils.hasText(request.getAppid()) ? request.getAppid() : properties.getAppId();
+        if (!StringUtils.hasText(appId)) {
+            throw new IllegalArgumentException("appId 不能为空");
+        }
+
+        String scope = StringUtils.hasText(request.getScope()) ? request.getScope() : "auth_user";
+        StringBuilder builder = new StringBuilder(AUTH_URL)
+                .append("?app_id=").append(urlEncode(appId))
+                .append("&scope=").append(urlEncode(scope))
+                .append("&redirect_uri=").append(urlEncode(request.getRedirectUri()));
+
+        if (StringUtils.hasText(request.getState())) {
+            builder.append("&state=").append(urlEncode(request.getState()));
+        }
+        return builder.toString();
     }
 
     /**
@@ -68,7 +93,7 @@ public class DefaultAliPayOAuth2Service extends AbstractAlipayService implements
      * @return OAuth2 令牌信息
      */
     @Override
-    public AliPaySystemOauthDetails querySystemOAuthTokenByAuthorizationCode(String authorizationCode) {
+    public AliPaySystemOauthDetails getAccessTokenByCode(String authorizationCode) {
         return getSystemOAuthToken(AUTHORIZATION_CODE, authorizationCode, null);
     }
 
@@ -79,7 +104,7 @@ public class DefaultAliPayOAuth2Service extends AbstractAlipayService implements
      * @return OAuth2 令牌信息
      */
     @Override
-    public AliPaySystemOauthDetails querySystemOAuthTokenByRefreshToken(String refreshToken) {
+    public AliPaySystemOauthDetails refreshAccessToken(String refreshToken) {
         return getSystemOAuthToken(REFRESH_TOKEN, null, refreshToken);
     }
 
@@ -109,5 +134,9 @@ public class DefaultAliPayOAuth2Service extends AbstractAlipayService implements
                     grantType, code, refreshToken, e.getErrCode(), e.getErrMsg(), e);
             throw AliPayException.REQUEST_TOKEN_ERROR;
         }
+    }
+
+    private String urlEncode(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 }

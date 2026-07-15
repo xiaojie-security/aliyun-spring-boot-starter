@@ -4,7 +4,6 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.DefaultAlipayClient;
 import com.aliyun.core.alipay.payment.AlipayPaymentService;
 import com.aliyun.core.alipay.payment.impl.DefaultAlipayPaymentService;
-import com.aliyun.properties.AliPayProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,12 +15,6 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "aliyun.pay.payment", name = "enable", havingValue = "true")
 public class AlipayPaymentConfiguration {
 
-    public static final String FORMAT = "json";
-    public static final String CHARSET = "UTF-8";
-    public static final String SIGN_TYPE = "RSA2";
-
-    private final AliPayProperties aliPayProperties;
-
     /**
      * 装配支付宝支付服务。
      *
@@ -30,20 +23,7 @@ public class AlipayPaymentConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(AlipayPaymentService.class)
-    public AlipayPaymentService alipayPaymentService() throws AlipayApiException {
-        com.alipay.api.AlipayConfig alipayConfig = new com.alipay.api.AlipayConfig();
-        alipayConfig.setServerUrl(aliPayProperties.getGateWay());
-        alipayConfig.setAppId(aliPayProperties.getAppId());
-        alipayConfig.setFormat(FORMAT);
-        alipayConfig.setPrivateKey(aliPayProperties.getPrivateKey());
-        if (aliPayProperties.isCertificates()) {
-            alipayConfig.setAppCertPath(aliPayProperties.getAppCertPath());
-            alipayConfig.setAlipayPublicCertPath(aliPayProperties.getAlipayPublicCertPath());
-            alipayConfig.setRootCertPath(aliPayProperties.getRootCertPath());
-        }
-        alipayConfig.setAlipayPublicKey(aliPayProperties.getPublicKey());
-        alipayConfig.setCharset(CHARSET);
-        alipayConfig.setSignType(SIGN_TYPE);
-        return new DefaultAlipayPaymentService(new DefaultAlipayClient(alipayConfig), aliPayProperties.getAliPayDetails());
+    public AlipayPaymentService alipayPaymentService(com.alipay.api.AlipayConfig alipayConfig) throws AlipayApiException {
+        return new DefaultAlipayPaymentService(new DefaultAlipayClient(alipayConfig));
     }
 }

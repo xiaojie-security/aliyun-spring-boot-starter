@@ -2,7 +2,8 @@ package com.aliyun.config;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.DefaultAlipayClient;
-import com.aliyun.core.alipay.payment.AliPayOAuth2Service;
+import com.aliyun.core.alipay.oauth2.AliPayOAuth2Service;
+import com.aliyun.core.alipay.oauth2.impl.DefaultAliPayOAuth2Service;
 import com.aliyun.properties.AliPayProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -23,7 +24,12 @@ public class AlipayOAuth2Configuration {
     public static final String SIGN_TYPE = "RSA2";
     private final AliPayProperties aliPayProperties;
 
-    
+    /**
+     * 装配支付宝 OAuth2 服务。
+     *
+     * @return OAuth2 服务
+     * @throws AlipayApiException 支付宝客户端初始化异常
+     */
     @Bean
     @ConditionalOnMissingBean(AliPayOAuth2Service.class)
     public AliPayOAuth2Service aliPayOAuth2Service() throws AlipayApiException {
@@ -40,6 +46,6 @@ public class AlipayOAuth2Configuration {
         alipayConfig.setAlipayPublicKey(aliPayProperties.getPublicKey());
         alipayConfig.setCharset(CHARSET);
         alipayConfig.setSignType(SIGN_TYPE);
-        return new AliPayOAuth2Service(new DefaultAlipayClient(alipayConfig), aliPayProperties.getAliPayDetails());
+        return new DefaultAliPayOAuth2Service(new DefaultAlipayClient(alipayConfig), aliPayProperties.getAliPayDetails());
     }
 }

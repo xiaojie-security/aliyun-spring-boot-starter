@@ -2,7 +2,8 @@ package com.aliyun.config;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.DefaultAlipayClient;
-import com.aliyun.core.alipay.payment.AlipayFundService;
+import com.aliyun.core.alipay.payment.AlipayPaymentService;
+import com.aliyun.core.alipay.payment.impl.DefaultAlipayPaymentService;
 import com.aliyun.properties.AliPayProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -10,22 +11,26 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * 阿里云支付配置。
- */
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "aliyun.pay.fund", name = "enable", havingValue = "true")
-public class AlipayFundConfiguration {
+@ConditionalOnProperty(prefix = "aliyun.pay.payment", name = "enable", havingValue = "true")
+public class AlipayPaymentConfiguration {
 
     public static final String FORMAT = "json";
     public static final String CHARSET = "UTF-8";
     public static final String SIGN_TYPE = "RSA2";
+
     private final AliPayProperties aliPayProperties;
-    
+
+    /**
+     * 装配支付宝支付服务。
+     *
+     * @return 支付服务
+     * @throws AlipayApiException 支付宝客户端初始化异常
+     */
     @Bean
-    @ConditionalOnMissingBean(AlipayFundService.class)
-    public AlipayFundService alipayFundService() throws AlipayApiException {
+    @ConditionalOnMissingBean(AlipayPaymentService.class)
+    public AlipayPaymentService alipayPaymentService() throws AlipayApiException {
         com.alipay.api.AlipayConfig alipayConfig = new com.alipay.api.AlipayConfig();
         alipayConfig.setServerUrl(aliPayProperties.getGateWay());
         alipayConfig.setAppId(aliPayProperties.getAppId());
@@ -39,7 +44,6 @@ public class AlipayFundConfiguration {
         alipayConfig.setAlipayPublicKey(aliPayProperties.getPublicKey());
         alipayConfig.setCharset(CHARSET);
         alipayConfig.setSignType(SIGN_TYPE);
-        return new AlipayFundService(new DefaultAlipayClient(alipayConfig), aliPayProperties.getAliPayDetails());
+        return new DefaultAlipayPaymentService(new DefaultAlipayClient(alipayConfig), aliPayProperties.getAliPayDetails());
     }
-
 }

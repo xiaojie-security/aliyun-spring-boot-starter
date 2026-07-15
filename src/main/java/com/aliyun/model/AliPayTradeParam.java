@@ -1,9 +1,9 @@
 package com.aliyun.model;
 
-import com.alipay.v3.model.ExtUserInfo;
-import com.alipay.v3.model.ExtendParams;
-import com.alipay.v3.model.GoodsDetail;
-import com.alipay.v3.model.SubMerchant;
+import com.alipay.api.domain.ExtUserInfo;
+import com.alipay.api.domain.ExtendParams;
+import com.alipay.api.domain.GoodsDetail;
+import com.alipay.api.domain.SubMerchant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

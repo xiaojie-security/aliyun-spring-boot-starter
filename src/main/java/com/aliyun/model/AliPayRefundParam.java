@@ -1,8 +1,8 @@
 package com.aliyun.model;
 
 
-import com.alipay.v3.model.OpenApiRoyaltyDetailInfoPojo;
-import com.alipay.v3.model.RefundGoodsDetail;
+import com.alipay.api.domain.OpenApiRoyaltyDetailInfoPojo;
+import com.alipay.api.domain.RefundGoodsDetail;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -14,7 +14,7 @@
 - 所有配置都放在 `aliyun` 根前缀下。
 - 各个服务分开配置，不再把所有信息聚合到一起。
 - 支付宝只保留一组全局配置 `aliyun.pay`，APP 支付、扫码支付、资金转账、OAuth2 共用同一套参数。
-- 支付宝功能开关仍然按 `app`、`fund`、`scan-code`、`oauth2` 分开控制。
+- 支付宝功能开关按 `payment`、`transfer`、`oauth2` 分开控制，其中 `payment` 同时承载 APP 支付与网站支付。
 - OSS、IMM、SMS、PNS 如果使用 `ramRoleArn` 获取临时凭证，建议同时开启 `aliyun.sts`。
 
 ## 各服务配置
@@ -107,7 +107,7 @@ aliyun:
 ### 支付宝配置
 
 - 全局配置前缀：`aliyun.pay`
-- 功能开关前缀：`aliyun.pay.app`、`aliyun.pay.scan-code`、`aliyun.pay.fund`、`aliyun.pay.oauth2`
+- 功能开关前缀：`aliyun.pay.payment`、`aliyun.pay.transfer`、`aliyun.pay.oauth2`
 
 #### 全局配置
 
@@ -125,11 +125,9 @@ aliyun:
     seller-id: your-seller-id
     validity-time: 1800000
 
-    app:
+    payment:
       enable: true
-    scan-code:
-      enable: true
-    fund:
+    transfer:
       enable: true
     oauth2:
       enable: true
@@ -138,21 +136,12 @@ aliyun:
 - 必填：`gate-way`、`private-key`
 - 二选一：`public-key` 或者证书模式的三个证书路径
 
-#### APP 支付
+#### 支付能力
 
 ```yaml
 aliyun:
   pay:
-    app:
-      enable: true
-```
-
-#### 扫码支付
-
-```yaml
-aliyun:
-  pay:
-    scan-code:
+    payment:
       enable: true
 ```
 
@@ -161,7 +150,7 @@ aliyun:
 ```yaml
 aliyun:
   pay:
-    fund:
+    transfer:
       enable: true
 ```
 
@@ -202,7 +191,7 @@ public class OssDemoController {
 ### OAuth2
 
 ```java
-import com.aliyun.core.alipay.payment.AliPayOAuth2Service;
+import com.aliyun.core.alipay.oauth2.AliPayOAuth2Service;
 import com.aliyun.model.AliPaySystemOauthDetails;
 import com.alipay.api.response.AlipayUserInfoShareResponse;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.aliyun.core.pay;
+package com.aliyun.core.alipay;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayRequest;

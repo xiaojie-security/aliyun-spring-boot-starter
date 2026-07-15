@@ -1,0 +1,4 @@
+com.aliyun.config.AlipayConfiguration
+com.aliyun.config.AlipayPaymentConfiguration
+com.aliyun.config.AlipayTransferConfiguration
+com.aliyun.config.AlipayOAuth2Configuration

@@ -6,15 +6,15 @@ import com.aliyun.core.alipay.oauth2.AliPayOAuth2Service;
 import com.aliyun.core.alipay.oauth2.impl.DefaultAliPayOAuth2Service;
 import com.aliyun.properties.AliPayProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 阿里云支付配置。
  */
-@Configuration
+@AutoConfiguration
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "aliyun.pay.oauth2", name = "enable", havingValue = "true")
 public class AlipayOAuth2Configuration {

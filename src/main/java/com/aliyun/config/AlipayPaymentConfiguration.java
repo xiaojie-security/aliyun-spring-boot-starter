@@ -6,12 +6,12 @@ import com.aliyun.core.alipay.payment.AlipayPaymentService;
 import com.aliyun.core.alipay.payment.impl.DefaultAlipayPaymentService;
 import com.aliyun.properties.AliPayProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@AutoConfiguration
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "aliyun.pay.payment", name = "enable", havingValue = "true")
 public class AlipayPaymentConfiguration {

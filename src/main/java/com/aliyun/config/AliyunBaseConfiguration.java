@@ -14,6 +14,24 @@ public abstract class AliyunBaseConfiguration {
     protected static final String RAM_ROLE_ARN = "ram_role_arn";
 
     /**
+     * 创建统一的阿里云凭证数据。
+     *
+     * @param accessKeyId 阿里云访问密钥 ID
+     * @param accessKeySecret 阿里云访问密钥 Secret
+     * @param ramRoleArn RAM 角色 ARN
+     * @param expire 临时凭证有效期
+     * @return 阿里云凭证数据
+     */
+    protected AliyunCredential createAliyunCredential(String accessKeyId, String accessKeySecret, String ramRoleArn, Long expire) {
+        return AliyunCredential.builder()
+                .accessKeyId(accessKeyId)
+                .accessKeySecret(accessKeySecret)
+                .ramRoleArn(ramRoleArn)
+                .expire(expire)
+                .build();
+    }
+
+    /**
      * 创建阿里云凭证配置。
      *
      * @param credential STS 凭证配置

@@ -3,15 +3,15 @@ package com.aliyun.config;
 import com.aliyun.core.sts.AliyunStsService;
 import com.aliyun.properties.AliyunStsProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 阿里云号码认证配置。
  */
-@Configuration
+@AutoConfiguration
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "aliyun.sts", name = "enable", havingValue = "true")
 public class AliyunStsConfiguration extends AliyunBaseConfiguration  {

@@ -9,28 +9,25 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.common.auth.DefaultCredentials;
 import com.aliyun.oss.common.comm.SignVersion;
 import com.aliyun.properties.AliyunOssProperties;
-import com.aliyun.properties.AliyunStsProperties;
 import com.aliyun.sdk.service.oss2.OSSClient;
 import com.aliyun.sdk.service.oss2.credentials.Credentials;
 import com.aliyun.sdk.service.oss2.credentials.CredentialsProvider;
 import com.aliyun.sdk.service.oss2.credentials.CredentialsProviderSupplier;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 阿里云 OSS 配置。
  */
-@Configuration
+@AutoConfiguration
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "aliyun.oss", name = "enable", havingValue = "true")
 public class AliyunOssConfiguration extends AliyunBaseConfiguration {
 
     private final AliyunOssProperties oss;
-    private final AliyunCredential credential;
 
 
     @Bean
@@ -39,16 +36,22 @@ public class AliyunOssConfiguration extends AliyunBaseConfiguration {
         if (oss == null) {
             return null;
         }
+        AliyunCredential credential = createAliyunCredential(
+                oss.getAccessKeyId(),
+                oss.getAccessKeySecret(),
+                oss.getRamRoleArn(),
+                oss.getExpire()
+        );
         com.aliyun.credentials.Client credentialClient = new com.aliyun.credentials.Client(
                 createCredentialConfig(credential));
 
         CredentialsProvider credentialsProviderV2 = new CredentialsProviderSupplier(() -> {
             try {
-                CredentialModel credential = credentialClient.getCredential();
+                CredentialModel credentialModel = credentialClient.getCredential();
                 return new Credentials(
-                        credential.getAccessKeyId(),
-                        credential.getAccessKeySecret(),
-                        credential.getSecurityToken()
+                        credentialModel.getAccessKeyId(),
+                        credentialModel.getAccessKeySecret(),
+                        credentialModel.getSecurityToken()
                 );
             } catch (Exception e) {
                 throw new RuntimeException("获取凭证失败", e);
@@ -68,6 +71,12 @@ public class AliyunOssConfiguration extends AliyunBaseConfiguration {
             return null;
         }
 
+        AliyunCredential credential = createAliyunCredential(
+                oss.getAccessKeyId(),
+                oss.getAccessKeySecret(),
+                oss.getRamRoleArn(),
+                oss.getExpire()
+        );
         com.aliyun.credentials.Client credentialClient = new com.aliyun.credentials.Client(
                 createCredentialConfig(credential));
         com.aliyun.oss.common.auth.CredentialsProvider credentialsProvider = new com.aliyun.oss.common.auth.CredentialsProvider() {
@@ -77,11 +86,11 @@ public class AliyunOssConfiguration extends AliyunBaseConfiguration {
 
             @Override
             public com.aliyun.oss.common.auth.Credentials getCredentials() {
-                CredentialModel credential = credentialClient.getCredential();
+                CredentialModel credentialModel = credentialClient.getCredential();
                 return new DefaultCredentials(
-                        credential.getAccessKeyId(),
-                        credential.getAccessKeySecret(),
-                        credential.getSecurityToken()
+                        credentialModel.getAccessKeyId(),
+                        credentialModel.getAccessKeySecret(),
+                        credentialModel.getSecurityToken()
                 );
             }
         };

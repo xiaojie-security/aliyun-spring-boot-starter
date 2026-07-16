@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "aliyun.pay.payment", name = "enable", havingValue = "true")
+@ConditionalOnProperty(prefix = "alipay.payment", name = "enable", havingValue = "true")
 public class AlipayPaymentConfiguration {
 
     /**

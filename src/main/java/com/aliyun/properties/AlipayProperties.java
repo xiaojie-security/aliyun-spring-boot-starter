@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @ToString
 @ConfigurationProperties(prefix = "aliyun.pay")
-@Component
 @Data
 public class AlipayProperties {
 

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @ToString
 @ConfigurationProperties(prefix = "aliyun.imm")
-@Component
 @Slf4j
 public class AliyunImmProperties extends AliyunBaseProperties implements InitializingBean {
 

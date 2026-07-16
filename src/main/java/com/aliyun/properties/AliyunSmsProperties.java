@@ -20,7 +20,6 @@ import java.util.Map;
 @AllArgsConstructor
 @ToString
 @ConfigurationProperties(prefix = "aliyun.sms")
-@Component
 @Slf4j
 public class AliyunSmsProperties extends AliyunBaseProperties implements InitializingBean {
 

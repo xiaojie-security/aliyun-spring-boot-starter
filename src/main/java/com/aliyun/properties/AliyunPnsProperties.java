@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @ToString
 @ConfigurationProperties(prefix = "aliyun.pns")
-@Component
 @Slf4j
 public class AliyunPnsProperties extends AliyunBaseProperties implements InitializingBean {
 

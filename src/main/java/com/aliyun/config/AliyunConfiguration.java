@@ -1,5 +1,7 @@
 package com.aliyun.config;
 
+import com.aliyun.properties.*;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -7,6 +9,14 @@ import org.springframework.context.annotation.Configuration;
  * 仅负责启用配置属性绑定，具体客户端装配由各子配置类负责。
  */
 @Configuration
+@EnableConfigurationProperties({
+        AlipayProperties.class,
+        AliyunImmProperties.class,
+        AliyunOssProperties.class,
+        AliyunPnsProperties.class,
+        AliyunSmsProperties.class,
+        AliyunStsProperties.class
+})
 public class AliyunConfiguration {
 
 }

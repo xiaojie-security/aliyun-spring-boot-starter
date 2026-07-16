@@ -19,7 +19,6 @@ import java.util.Map;
 @AllArgsConstructor
 @ToString
 @ConfigurationProperties(prefix = "aliyun.oss")
-@Component
 @Slf4j
 public class AliyunOssProperties extends AliyunBaseProperties implements InitializingBean {
 

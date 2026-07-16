@@ -60,6 +60,7 @@ import com.aliyun.core.alipay.transfer.enums.AlipayFundTransferProductCode;
 import com.aliyun.core.alipay.transfer.enums.AlipayTransferParticipantIdentityType;
 import com.aliyun.core.alipay.transfer.enums.AlipayTransferStatus;
 import com.aliyun.exception.AliPayException;
+import com.aliyun.provider.AlipayConfigProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -77,8 +78,7 @@ public class DefaultAlipayTransferService extends AbstractAlipayService implemen
     private static final String DEFAULT_ACCOUNT_TYPE = AlipayFundAccountType.ACCTRANS_ACCOUNT.getCode();
     private static final String DEFAULT_PAYEE_IDENTITY_TYPE = AlipayTransferParticipantIdentityType.ALIPAY_OPEN_ID.getCode();
 
-
-    private final AlipayClient client;
+    private final AlipayConfigProvider provider;
 
 
     /**
@@ -88,7 +88,12 @@ public class DefaultAlipayTransferService extends AbstractAlipayService implemen
      */
     @Override
     protected AlipayClient getAlipayClient() {
-        return client;
+        return createAlipayClient();
+    }
+
+    @Override
+    protected AlipayConfigProvider getAlipayConfigProvider() {
+        return provider;
     }
 
     @Override

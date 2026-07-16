@@ -1,19 +1,20 @@
 package com.aliyun.core.alipay;
 
 import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
 import com.alipay.api.AlipayRequest;
 import com.alipay.api.AlipayResponse;
-import com.aliyun.properties.AlipayProperties;
-import jakarta.annotation.Resource;
-import org.springframework.stereotype.Component;
+import com.alipay.api.DefaultAlipayClient;
+import com.aliyun.provider.AlipayConfigProvider;
 
-@Component
 public abstract class AbstractAlipayService {
+    private static final String FORMAT = "json";
+    private static final String CHARSET = "UTF-8";
+    private static final String SIGN_TYPE = "RSA2";
 
-    protected abstract com.alipay.api.AlipayClient getAlipayClient();
+    protected abstract AlipayClient getAlipayClient();
 
-    @Resource
-    protected AlipayProperties properties;
+    protected abstract AlipayConfigProvider getAlipayConfigProvider();
 
     /**
      * 执行支付宝请求。
@@ -52,6 +53,40 @@ public abstract class AbstractAlipayService {
      * @return true-启用证书模式，false-公钥模式
      */
     protected boolean useCertificateMode() {
-        return properties != null && properties.isCertificates();
+        return getCurrentConfig().isCertificates();
+    }
+
+    protected com.aliyun.provider.domain.AlipayConfig getCurrentConfig() {
+        AlipayConfigProvider provider = getAlipayConfigProvider();
+        if (provider == null) {
+            throw new IllegalStateException("AlipayConfigProvider 未初始化");
+        }
+        com.aliyun.provider.domain.AlipayConfig config = provider.getConfig();
+        if (config == null) {
+            throw new IllegalStateException("AlipayConfigProvider 返回的配置不能为空");
+        }
+        return config;
+    }
+
+    protected AlipayClient createAlipayClient() {
+        com.aliyun.provider.domain.AlipayConfig config = getCurrentConfig();
+        com.alipay.api.AlipayConfig alipayConfig = new com.alipay.api.AlipayConfig();
+        alipayConfig.setServerUrl(config.getGateWay());
+        alipayConfig.setAppId(config.getAppId());
+        alipayConfig.setFormat(FORMAT);
+        alipayConfig.setPrivateKey(config.getPrivateKey());
+        if (config.isCertificates()) {
+            alipayConfig.setAppCertPath(config.getAppCertPath());
+            alipayConfig.setAlipayPublicCertPath(config.getAlipayPublicCertPath());
+            alipayConfig.setRootCertPath(config.getRootCertPath());
+        }
+        alipayConfig.setAlipayPublicKey(config.getPublicKey());
+        alipayConfig.setCharset(CHARSET);
+        alipayConfig.setSignType(SIGN_TYPE);
+        try {
+            return new DefaultAlipayClient(alipayConfig);
+        } catch (AlipayApiException e) {
+            throw new IllegalStateException("支付宝客户端创建失败", e);
+        }
     }
 }

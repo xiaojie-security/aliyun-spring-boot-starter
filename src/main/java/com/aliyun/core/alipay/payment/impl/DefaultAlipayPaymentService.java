@@ -43,6 +43,7 @@ import com.aliyun.core.alipay.payment.domain.AliPayTradeCloseResult;
 import com.aliyun.core.alipay.payment.domain.AliPayTradeQueryParam;
 import com.aliyun.core.alipay.payment.domain.AliPayTradeQueryResult;
 import com.aliyun.exception.AliPayException;
+import com.aliyun.provider.AlipayConfigProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -66,11 +67,16 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
     private static final String DEFAULT_INTEGRATION_TYPE = "PCWEB";
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private final com.alipay.api.AlipayClient alipayClient;
+    private final AlipayConfigProvider provider;
 
     @Override
     protected AlipayClient getAlipayClient() {
-        return alipayClient;
+        return createAlipayClient();
+    }
+
+    @Override
+    protected AlipayConfigProvider getAlipayConfigProvider() {
+        return provider;
     }
 
     /**
@@ -569,7 +575,7 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
         if (StringUtils.hasText(sellerId)) {
             return sellerId;
         }
-        return properties == null ? null : properties.getSellerId();
+        return getCurrentConfig().getSellerId();
     }
 
     private String resolveIntegrationType(String integrationType) {
@@ -580,10 +586,11 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
         if (StringUtils.hasText(paymentParam.getTimeExpire())) {
             return paymentParam.getTimeExpire();
         }
-        if (properties == null || properties.getValidityTime() == null || properties.getValidityTime() <= 0) {
+        Long validityTime = getCurrentConfig().getValidityTime();
+        if (validityTime == null || validityTime <= 0) {
             return null;
         }
-        return LocalDateTime.now().plus(properties.getValidityTime(), ChronoUnit.MILLIS)
+        return LocalDateTime.now().plus(validityTime, ChronoUnit.MILLIS)
                 .format(TIME_FORMATTER);
     }
 

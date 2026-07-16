@@ -14,6 +14,7 @@ import com.aliyun.core.alipay.oauth2.domain.AuthorizationRequest;
 import com.aliyun.core.alipay.oauth2.enums.AlipayOauthGrantType;
 import com.aliyun.core.alipay.oauth2.enums.AlipayOauthScope;
 import com.aliyun.exception.AliPayException;
+import com.aliyun.provider.AlipayConfigProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -22,19 +23,7 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class DefaultAliPayOAuth2Service extends AbstractAlipayService implements AliPayOAuth2Service {
     private static final String AUTH_URL = "https://openauth.alipay.com/oauth2/publicAppAuthorize.htm";
-
-    private final AlipayClient client;
-
-    /**
-     * 获取当前服务使用的支付宝客户端。
-     *
-     * @return 支付宝客户端
-     */
-    @Override
-    protected AlipayClient getAlipayClient() {
-        return client;
-    }
-
+    private final AlipayConfigProvider provider;
     /**
      * 生成支付宝授权地址。
      *
@@ -161,10 +150,20 @@ public class DefaultAliPayOAuth2Service extends AbstractAlipayService implements
     }
 
     private String resolveAppId(String appId) {
-        String resolvedAppId = StringUtils.hasText(appId) ? appId : (properties == null ? null : properties.getAppId());
+        String resolvedAppId = StringUtils.hasText(appId) ? appId : getCurrentConfig().getAppId();
         if (!StringUtils.hasText(resolvedAppId)) {
             throw new IllegalArgumentException("appId 不能为空");
         }
         return resolvedAppId;
+    }
+
+    @Override
+    protected AlipayClient getAlipayClient() {
+        return createAlipayClient();
+    }
+
+    @Override
+    protected AlipayConfigProvider getAlipayConfigProvider() {
+        return provider;
     }
 }

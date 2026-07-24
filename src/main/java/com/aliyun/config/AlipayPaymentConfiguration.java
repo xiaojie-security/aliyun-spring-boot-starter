@@ -2,6 +2,8 @@ package com.aliyun.config;
 
 import com.aliyun.core.alipay.payment.AlipayPaymentService;
 import com.aliyun.core.alipay.payment.impl.DefaultAlipayPaymentService;
+import com.aliyun.core.alipay.payment.AlipayPaymentCallbackService;
+import com.aliyun.core.alipay.payment.impl.DefaultAlipayPaymentCallbackService;
 import com.aliyun.provider.AlipayConfigProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -23,5 +25,16 @@ public class AlipayPaymentConfiguration {
     @ConditionalOnMissingBean(AlipayPaymentService.class)
     public AlipayPaymentService alipayPaymentService(AlipayConfigProvider provider) {
         return new DefaultAlipayPaymentService(provider);
+    }
+
+    /**
+     * 装配支付宝支付回调服务。
+     *
+     * @return 支付回调服务
+     */
+    @Bean
+    @ConditionalOnMissingBean(AlipayPaymentCallbackService.class)
+    public AlipayPaymentCallbackService alipayPaymentCallbackService(AlipayConfigProvider provider) {
+        return new DefaultAlipayPaymentCallbackService(provider);
     }
 }

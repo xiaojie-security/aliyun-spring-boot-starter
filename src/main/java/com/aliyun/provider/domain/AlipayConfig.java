@@ -64,6 +64,11 @@ public class AlipayConfig {
     private Boolean certificates;
 
     /**
+     * 支付异步通知地址
+     */
+    private String paymentNotifyUrl;
+
+    /**
      * 是否启用证书模式。
      *
      * @return true-启用证书模式，false-未启用证书模式

@@ -120,7 +120,7 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
         model.setSettleInfo(paymentParam.getSettleInfo());
         model.setRoyaltyInfo(paymentParam.getRoyaltyInfo());
 
-        request.setNotifyUrl(paymentParam.getNotifyUrl());
+        request.setNotifyUrl(resolveNotifyUrl(paymentParam.getNotifyUrl()));
         request.setBizModel(model);
 
         try {
@@ -186,7 +186,7 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
         model.setSettleInfo(paymentParam.getSettleInfo());
         model.setRoyaltyInfo(paymentParam.getRoyaltyInfo());
 
-        request.setNotifyUrl(paymentParam.getNotifyUrl());
+        request.setNotifyUrl(resolveNotifyUrl(paymentParam.getNotifyUrl()));
         request.setReturnUrl(paymentParam.getReturnUrl());
         request.setBizModel(model);
 
@@ -240,7 +240,7 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
         model.setSettleInfo(paymentParam.getSettleInfo());
         model.setRoyaltyInfo(paymentParam.getRoyaltyInfo());
 
-        request.setNotifyUrl(paymentParam.getNotifyUrl());
+        request.setNotifyUrl(resolveNotifyUrl(paymentParam.getNotifyUrl()));
         request.setReturnUrl(paymentParam.getReturnUrl());
         request.setBizModel(model);
 
@@ -294,7 +294,7 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
         model.setSettleInfo(paymentParam.getSettleInfo());
         model.setRoyaltyInfo(paymentParam.getRoyaltyInfo());
 
-        request.setNotifyUrl(paymentParam.getNotifyUrl());
+        request.setNotifyUrl(resolveNotifyUrl(paymentParam.getNotifyUrl()));
         request.setReturnUrl(paymentParam.getReturnUrl());
         request.setBizModel(model);
 
@@ -576,6 +576,20 @@ public class DefaultAlipayPaymentService extends AbstractAlipayService implement
             return sellerId;
         }
         return getCurrentConfig().getSellerId();
+    }
+
+    /**
+     * 解析异步通知地址。
+     * 优先使用支付参数中的 notifyUrl，未传时回退到全局配置 paymentNotifyUrl。
+     *
+     * @param notifyUrl 支付参数中的异步通知地址
+     * @return 最终异步通知地址
+     */
+    private String resolveNotifyUrl(String notifyUrl) {
+        if (StringUtils.hasText(notifyUrl)) {
+            return notifyUrl;
+        }
+        return getCurrentConfig().getPaymentNotifyUrl();
     }
 
     private String resolveIntegrationType(String integrationType) {

@@ -124,6 +124,7 @@ aliyun:
     root-cert-path: cert/alipayRootCert.crt
     seller-id: your-seller-id
     validity-time: 1800000
+    payment-notify-url: https://your-domain.com/api/alipay/notify
 
     payment:
       enable: true
